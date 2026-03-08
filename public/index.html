@@ -772,7 +772,7 @@ function renderScene(sceneId, players, opts={}) {
       ? (0.82 + 0.28 * (0.5 + 0.5 * Math.sin(angle)))   // 0.82 … 1.10
       : (0.75 + 0.22 * (0.5 + 0.5 * Math.sin(angle)));
 
-    const baseSize = isFullscreen ? 88 : 60;
+    const baseSize = isFullscreen ? 160 : 90;
     const avSize = Math.round(baseSize * perspScale);
 
     const realX = vx * scaleX;
