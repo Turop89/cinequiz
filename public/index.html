@@ -484,27 +484,48 @@ function buildCasinoRoom(W, H) {
 
   // Ceiling / baseboard trim
   s+=`<line x1="${cornerL}" y1="${wallTop}" x2="${cornerR}" y2="${wallTop}" stroke="${C_WOOD_L}" stroke-width="10" opacity=".9"/>`;
-  s+=`<line x1="${cornerL}" y1="${wallBottomL}" x2="${cornerR}" y2="${wallBottomR}" stroke="${C_WOOD}" stroke-width="8" opacity=".8"/>`;
   // Angled ceiling trims to corners
   s+=`<line x1="0" y1="0" x2="${cornerL}" y2="${wallTop}" stroke="${C_WOOD}" stroke-width="8" opacity=".7"/>`;
   s+=`<line x1="${VW}" y1="0" x2="${cornerR}" y2="${wallTop}" stroke="${C_WOOD}" stroke-width="8" opacity=".7"/>`;
-  // Floor baseboard
-  s+=`<polygon points="${leftEdge},${VH*0.88} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${VH*0.88}" fill="${C_WOOD}" opacity=".7"/>`;
-  s+=`<polygon points="${leftEdge},${VH*0.88} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${VH*0.88}" fill="${C_WOOD_L}" opacity=".2"/>`;
 
-  // ── FLOOR ──
-  s+=`<polygon points="${leftEdge},${VH*0.88} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${VH*0.88} ${rightEdge},${VH} ${leftEdge},${VH}" fill="${C_FLOOR}"/>`;
-  // Floor tile lines
-  const fY=VH*0.88, fH=VH-fY;
-  const nTiles=8;
-  for(let i=1;i<nTiles;i++){
-    const t=i/nTiles;
-    s+=`<line x1="${leftEdge+VW*t}" y1="${VH}" x2="${leftEdge+VW*t-(VW*.12)*t}" y2="${fY}" stroke="rgba(255,255,255,.04)" stroke-width="1"/>`;
+  // ── WOOD FLOOR ──
+  const fY=VH*0.78, fH=VH-fY;
+  const plankColors=['#7a4a18','#8b5520','#6b3e14','#9a6028','#7a4820','#885018'];
+  const plankW=52, plankH=18;
+  const plankRows=Math.ceil(fH/plankH)+2;
+  const plankCols=Math.ceil(VW/plankW)+2;
+  // clip to floor shape
+  s+=`<defs><clipPath id="floorClip"><polygon points="${leftEdge},${fY} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${fY} ${rightEdge},${VH} ${leftEdge},${VH}"/></clipPath></defs>`;
+  s+=`<g clip-path="url(#floorClip)">`;
+  // Base warm brown
+  s+=`<rect x="0" y="${fY}" width="${VW}" height="${fH}" fill="#6b3a12"/>`;
+  // Planks with perspective: each row gets slightly wider planks toward bottom
+  for(let row=0;row<plankRows;row++){
+    const ry=fY+row*plankH;
+    const perspective=1+row*(0.18/plankRows);
+    const pw=plankW*perspective;
+    const rowOffset=(row%2===0)?0:pw/2;
+    for(let col=-1;col<plankCols+1;col++){
+      const rx=col*pw+rowOffset-pw;
+      const col1=plankColors[(row*3+col)%plankColors.length];
+      const col2=plankColors[(row*2+col+3)%plankColors.length];
+      // plank body
+      s+=`<rect x="${rx}" y="${ry}" width="${pw-1.5}" height="${plankH-1}" rx="1" fill="${col1}"/>`;
+      // wood grain highlight
+      s+=`<rect x="${rx+2}" y="${ry+2}" width="${pw-8}" height="3" rx="1" fill="${col2}" opacity=".35"/>`;
+      s+=`<rect x="${rx+4}" y="${ry+8}" width="${pw-14}" height="2" rx="1" fill="${col2}" opacity=".2"/>`;
+      // plank edge shadow
+      s+=`<line x1="${rx}" y1="${ry+plankH-1}" x2="${rx+pw-1.5}" y2="${ry+plankH-1}" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>`;
+      s+=`<line x1="${rx+pw-1.5}" y1="${ry}" x2="${rx+pw-1.5}" y2="${ry+plankH}" stroke="rgba(0,0,0,.18)" stroke-width="1"/>`;
+    }
   }
-  for(let i=1;i<5;i++){
-    const t=i/5;
-    s+=`<line x1="${leftEdge}" y1="${fY+fH*t}" x2="${rightEdge}" y2="${fY+fH*t}" stroke="rgba(255,255,255,.04)" stroke-width="1"/>`;
-  }
+  // Subtle varnish sheen overlay
+  s+=`<polygon points="${leftEdge},${fY} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${fY} ${rightEdge},${VH} ${leftEdge},${VH}" fill="url(#lampGlow)" opacity=".18"/>`;
+  s+=`</g>`;
+  // Baseboard where wall meets floor
+  s+=`<line x1="${cornerL}" y1="${wallBottomL}" x2="${cornerR}" y2="${wallBottomR}" stroke="${C_WOOD}" stroke-width="8" opacity=".9"/>`;
+  s+=`<line x1="${leftEdge}" y1="${fY}" x2="${cornerL}" y2="${wallBottomL}" stroke="${C_WOOD_L}" stroke-width="5" opacity=".5"/>`;
+  s+=`<line x1="${cornerR}" y1="${wallBottomR}" x2="${rightEdge}" y2="${fY}" stroke="${C_WOOD_L}" stroke-width="5" opacity=".5"/>`;
 
   // ── WALL PICTURES ──
   // Back wall: two flanking pictures + centre whiteboard
