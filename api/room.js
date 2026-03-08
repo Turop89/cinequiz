@@ -23,7 +23,7 @@ export default async function handler(req, res) {
       rooms[code] = {
         status: "lobby",
         host: playerId,
-        players: [{ id: playerId, name: playerName, isHost: true }],
+        players: [{ id: playerId, name: playerName, isHost: true, avatarId: data?.avatarId||0 }],
         questions: [],
         currentQ: 0,
         scores: {},
@@ -39,7 +39,7 @@ export default async function handler(req, res) {
       if (!room) return res.status(404).json({ error: "Raum nicht gefunden!" });
       if (room.status !== "lobby") return res.status(400).json({ error: "Spiel läuft bereits!" });
       if (room.players.length >= 8) return res.status(400).json({ error: "Raum ist voll!" });
-      room.players.push({ id: playerId, name: playerName, isHost: false });
+      room.players.push({ id: playerId, name: playerName, isHost: false, avatarId: data?.avatarId||0 });
       await pusher.trigger(`room-${roomCode}`, "player-joined", { players: room.players });
       return res.status(200).json({ room });
     }
