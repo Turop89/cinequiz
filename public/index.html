@@ -102,59 +102,196 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
 .avatar-opt svg{width:44px;height:44px;display:block;margin:0 auto 3px}
 .avatar-opt .aname{font-size:.6rem;color:#b07040;font-weight:700}
 
-/* ── PUB SCENE (larger) ── */
-.pub-scene{width:100%;position:relative;height:260px;margin-bottom:4px;flex-shrink:0}
-.round-table{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);width:170px;height:86px;background:radial-gradient(ellipse,#6b3a1a 55%,#3a1e08 100%);border:4px solid #8b5a2b;border-radius:50%;box-shadow:0 10px 28px rgba(0,0,0,.65)}
-.round-table::after{content:'🍺';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1.5rem}
-.seat{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .3s}
-.seat svg{width:60px;height:60px;filter:drop-shadow(0 4px 8px rgba(0,0,0,.65))}
-.seat .sname{font-size:.62rem;color:#f0e6d3;background:rgba(0,0,0,.7);padding:2px 7px;border-radius:10px;white-space:nowrap;max-width:72px;overflow:hidden;text-overflow:ellipsis;text-align:center;font-weight:700}
-.seat .sbadge{font-size:.8rem;position:absolute;top:-5px;right:-5px}
-.seat.is-picker svg{filter:drop-shadow(0 0 10px rgba(245,197,24,.9));animation:glow 1.5s ease infinite alternate}
-@keyframes glow{0%{filter:drop-shadow(0 0 5px rgba(245,197,24,.6))}100%{filter:drop-shadow(0 0 16px rgba(245,197,24,1))}}
+/* ── PUB SCENE – immersive, fills the screen ── */
+.pub-scene{width:100%;position:relative;height:340px;margin-bottom:0;flex-shrink:0}
+.pub-scene-full{
+  position:fixed;inset:0;z-index:8;
+  pointer-events:none;
+}
+/* Large table that fills ~60% of the scene */
+.round-table{
+  position:absolute;bottom:6px;left:50%;transform:translateX(-50%);
+  width:260px;height:130px;
+  background:radial-gradient(ellipse 70% 60% at 50% 40%,#8b4a1e 0%,#5a2e0a 55%,#3a1a06 100%);
+  border:5px solid #a06030;border-radius:50%;
+  box-shadow:0 14px 40px rgba(0,0,0,.75),inset 0 2px 6px rgba(255,180,80,.12);
+}
+/* Drinks on the table via ::before + ::after + child spans */
+.round-table .drinks{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  font-size:1.4rem;letter-spacing:4px;user-select:none;
+  text-shadow:0 2px 4px rgba(0,0,0,.6);
+}
+.seat{position:absolute;display:flex;flex-direction:column;align-items:center;gap:3px;transition:all .3s;pointer-events:none}
+.seat svg{width:72px;height:72px;filter:drop-shadow(0 5px 10px rgba(0,0,0,.7))}
+.seat .sname{
+  font-size:.65rem;color:#f0e6d3;
+  background:rgba(0,0,0,.75);backdrop-filter:blur(4px);
+  padding:2px 8px;border-radius:10px;
+  white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis;
+  text-align:center;font-weight:700;border:1px solid rgba(255,180,60,.15);
+}
+.seat .sbadge{font-size:.85rem;position:absolute;top:-6px;right:-6px}
+.seat.is-picker svg{filter:drop-shadow(0 0 12px rgba(245,197,24,1));animation:glow 1.5s ease infinite alternate}
+@keyframes glow{0%{filter:drop-shadow(0 0 6px rgba(245,197,24,.7))}100%{filter:drop-shadow(0 0 20px rgba(245,197,24,1))}}
 .seat.jubel svg{animation:jubel .5s ease infinite alternate}
-@keyframes jubel{0%{transform:translateY(0) rotate(-5deg) scale(1)}100%{transform:translateY(-12px) rotate(5deg) scale(1.15)}}
+@keyframes jubel{0%{transform:translateY(0) rotate(-6deg) scale(1)}100%{transform:translateY(-14px) rotate(6deg) scale(1.18)}}
 
-/* ── PICK SCREEN ── */
-.pick-banner{text-align:center;padding:18px;background:rgba(245,197,24,.1);border:1.5px solid rgba(245,197,24,.4);border-radius:16px;width:100%}
-.pick-banner .pb-title{font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:900;color:var(--gold)}
-.pick-banner .pb-sub{font-size:.85rem;color:#b07040;margin-top:5px}
-.diff-pick-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%}
-.diff-card{padding:18px 8px;border-radius:14px;border:1.5px solid var(--border);background:rgba(0,0,0,.35);cursor:pointer;transition:all .25s;text-align:center}
-.diff-card:hover,.diff-card.sel{transform:translateY(-4px);box-shadow:0 10px 28px rgba(0,0,0,.45)}
-.diff-card.d0:hover,.diff-card.d0.sel{border-color:var(--green);background:rgba(46,204,113,.1)}
-.diff-card.d1:hover,.diff-card.d1.sel{border-color:var(--gold);background:rgba(245,197,24,.1)}
-.diff-card.d2:hover,.diff-card.d2.sel{border-color:var(--red);background:rgba(231,76,60,.1)}
-.diff-card .dc-icon{font-size:2rem;margin-bottom:7px}
-.diff-card .dc-name{font-size:.92rem;font-weight:800}
-.diff-card .dc-pts{font-size:.7rem;color:#b07040;margin-top:4px}
-.diff-card.d0 .dc-name{color:var(--green)}.diff-card.d1 .dc-name{color:var(--gold)}.diff-card.d2 .dc-name{color:var(--red)}
+/* ── ROOM OVERLAY LAYOUT (pick + quiz) ── */
+/* The room screens use fixed positioning for an immersive feel */
+#sPick,#sQuiz{
+  position:fixed;inset:0;
+  max-width:100%;
+  padding:0;
+  gap:0;
+  justify-content:flex-start;
+  overflow:hidden;
+}
 
-/* ── QUIZ ── */
-.quiz-header{width:100%;display:flex;justify-content:space-between;align-items:center}
-.q-meta{font-size:.8rem;color:#b07040;font-weight:700}
-.q-score{font-weight:800;color:var(--gold);font-size:1rem}
-.prog{width:100%;background:#2a1005;border-radius:10px;height:5px;overflow:hidden}
+/* Top HUD bar pinned to top */
+.room-hud{
+  position:absolute;top:0;left:0;right:0;z-index:20;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px 8px;
+  background:linear-gradient(180deg,rgba(10,5,0,.9) 0%,rgba(10,5,0,0) 100%);
+}
+.room-hud .logo-sm{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(245,197,24,.4)}
+.room-hud .logo-sm span{color:var(--orange)}
+.hud-right{display:flex;align-items:center;gap:10px}
+.hud-score{font-weight:800;color:var(--gold);font-size:.95rem;background:rgba(0,0,0,.5);padding:4px 12px;border-radius:20px;border:1px solid rgba(245,197,24,.25)}
+.hud-round{font-size:.78rem;color:#b07040;font-weight:700;background:rgba(0,0,0,.4);padding:4px 10px;border-radius:20px}
+
+/* Full-bleed pub scene inside fixed screens */
+.room-scene{
+  position:absolute;inset:0;
+  display:flex;align-items:flex-end;justify-content:center;
+  padding-bottom:0;
+}
+.room-scene .round-table{
+  width:min(70vw,340px);
+  height:min(35vw,175px);
+  bottom:30%;
+}
+
+/* Bottom sheet that slides up over the scene */
+.bottom-sheet{
+  position:absolute;bottom:0;left:0;right:0;z-index:20;
+  background:linear-gradient(180deg,rgba(12,6,0,0) 0%,rgba(12,6,0,.97) 12%,rgba(12,6,0,1) 100%);
+  padding:0 12px 12px;
+  display:flex;flex-direction:column;gap:7px;
+}
+
+/* Pick bottom sheet */
+.pick-bottom{padding-top:22px}
+.pick-top-bar{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding-bottom:8px;
+}
+.pb-title{font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:900;color:var(--gold)}
+.pb-sub{font-size:.78rem;color:#b07040;font-weight:700}
+
+/* Compact category row */
+.cat-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
+.cat-strip::-webkit-scrollbar{display:none}
+.cat-chip{
+  flex-shrink:0;
+  padding:7px 13px;
+  background:rgba(0,0,0,.55);border:1.5px solid #3a1e08;
+  border-radius:20px;color:#c4956a;font-size:.78rem;font-weight:700;
+  cursor:pointer;transition:all .2s;white-space:nowrap;
+  font-family:'Nunito',sans-serif;
+}
+.cat-chip.sel{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.12)}
+
+/* Compact diff row */
+.diff-strip{display:flex;gap:6px}
+.diff-chip{
+  flex:1;padding:9px 6px;
+  background:rgba(0,0,0,.55);border:1.5px solid #3a1e08;
+  border-radius:12px;color:#c4956a;font-size:.8rem;font-weight:800;
+  cursor:pointer;transition:all .2s;text-align:center;
+  font-family:'Nunito',sans-serif;
+}
+.diff-chip.d0.sel,.diff-chip.d0:hover{border-color:var(--green);color:var(--green);background:rgba(46,204,113,.1)}
+.diff-chip.d1.sel,.diff-chip.d1:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.1)}
+.diff-chip.d2.sel,.diff-chip.d2:hover{border-color:var(--red);color:var(--red);background:rgba(231,76,60,.1)}
+
+/* Quiz bottom sheet */
+.quiz-bottom{padding-top:14px}
+.prog{width:100%;background:rgba(255,255,255,.08);border-radius:10px;height:4px;overflow:hidden;margin-bottom:1px}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:10px;transition:width .5s}
-.timer-row{width:100%;display:flex;align-items:center;gap:10px}
-.t-bar{flex:1;background:#2a1005;border-radius:10px;height:9px;overflow:hidden}
+.timer-row{width:100%;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.t-bar{flex:1;background:rgba(255,255,255,.08);border-radius:10px;height:7px;overflow:hidden}
 .t-fill{height:100%;border-radius:10px;transition:width .1s linear,background .4s}
-.t-num{font-size:1rem;font-weight:800;min-width:28px;text-align:right;color:var(--gold)}
-.q-card{background:rgba(22,10,2,.96);border-radius:16px;padding:22px;width:100%;border:1px solid var(--border)}
-.q-cat{font-size:.65rem;color:var(--orange);text-transform:uppercase;letter-spacing:2px;margin-bottom:7px;font-weight:800}
-.q-text{font-size:1.05rem;line-height:1.6;font-weight:600}
-.picker-tag{display:inline-block;padding:4px 12px;border-radius:20px;font-size:.72rem;font-weight:700;margin-bottom:9px}
+.t-num{font-size:.95rem;font-weight:800;min-width:26px;text-align:right;color:var(--gold)}
+.q-card{
+  background:rgba(15,8,2,.92);border-radius:14px;padding:14px 16px;width:100%;
+  border:1px solid rgba(90,48,16,.6);backdrop-filter:blur(8px);
+}
+.q-cat{font-size:.6rem;color:var(--orange);text-transform:uppercase;letter-spacing:2px;margin-bottom:5px;font-weight:800}
+.q-text{font-size:1rem;line-height:1.5;font-weight:700}
+.picker-tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.68rem;font-weight:700;margin-bottom:6px}
 .tag-green{background:rgba(46,204,113,.18);border:1px solid var(--green);color:var(--green)}
 .tag-gold{background:rgba(245,197,24,.18);border:1px solid var(--gold);color:var(--gold)}
 .tag-red{background:rgba(231,76,60,.18);border:1px solid var(--red);color:var(--red)}
-.ans-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%}
-.ans-btn{padding:14px 13px;background:rgba(0,0,0,.45);border:1.5px solid var(--border);border-radius:13px;color:var(--text);font-size:.88rem;cursor:pointer;transition:all .2s;text-align:left;line-height:1.4;font-family:'Nunito',sans-serif;font-weight:600}
-.ans-btn:hover:not(:disabled){border-color:var(--gold);background:rgba(245,197,24,.08);transform:translateY(-2px)}
-.ans-btn.chosen{border-color:var(--blue);background:rgba(52,152,219,.18);color:#7ec8e3}
-.ans-btn.correct{background:rgba(46,204,113,.18);border-color:var(--green);color:var(--green)}
-.ans-btn.wrong{background:rgba(231,76,60,.12);border-color:var(--red);color:#e88}
+.ans-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%}
+.ans-btn{
+  padding:11px 12px;
+  background:rgba(0,0,0,.6);border:1.5px solid rgba(90,48,16,.6);
+  border-radius:12px;color:var(--text);font-size:.84rem;
+  cursor:pointer;transition:all .2s;text-align:left;line-height:1.35;
+  font-family:'Nunito',sans-serif;font-weight:600;
+  backdrop-filter:blur(4px);
+}
+.ans-btn:hover:not(:disabled){border-color:var(--gold);background:rgba(245,197,24,.1);transform:translateY(-2px)}
+.ans-btn.chosen{border-color:var(--blue);background:rgba(52,152,219,.2);color:#7ec8e3}
+.ans-btn.correct{background:rgba(46,204,113,.2);border-color:var(--green);color:var(--green)}
+.ans-btn.wrong{background:rgba(231,76,60,.15);border-color:var(--red);color:#e88}
 .ans-btn:disabled{cursor:default}
-.status-info{text-align:center;font-size:.88rem;color:#b07040;min-height:22px;width:100%;font-weight:700}
+.status-info{text-align:center;font-size:.82rem;color:#b07040;min-height:18px;width:100%;font-weight:700}
+
+/* Exit button – bottom right, stylish */
+.btn-exit-room{
+  position:absolute;bottom:14px;right:14px;z-index:30;
+  background:rgba(60,15,5,.85);
+  color:rgba(220,100,80,.9);
+  border:1px solid rgba(180,60,40,.35);
+  border-radius:50px;
+  padding:8px 16px 8px 12px;
+  font-size:.75rem;font-weight:800;
+  cursor:pointer;font-family:'Nunito',sans-serif;
+  display:flex;align-items:center;gap:6px;
+  transition:all .25s;
+  backdrop-filter:blur(6px);
+  box-shadow:0 4px 16px rgba(0,0,0,.5);
+  letter-spacing:.5px;
+}
+.btn-exit-room:hover{
+  background:rgba(140,30,10,.7);
+  border-color:rgba(231,76,60,.6);
+  color:#ff8060;
+  transform:translateY(-1px);
+  box-shadow:0 6px 20px rgba(0,0,0,.6);
+}
+.btn-exit-room svg{width:14px;height:14px;flex-shrink:0}
+
+/* Pick wait box */
+.pick-wait{
+  text-align:center;padding:14px;
+  background:rgba(52,152,219,.08);border:1px solid rgba(52,152,219,.2);
+  border-radius:14px;color:var(--blue);font-size:.85rem;font-weight:600;
+}
+
+/* Legacy pub-scene used in lobby/reveal/final — keep smaller */
+.screen:not(#sPick):not(#sQuiz) .pub-scene{width:100%;position:relative;height:280px;margin-bottom:4px;flex-shrink:0}
+.screen:not(#sPick):not(#sQuiz) .round-table{
+  position:absolute;bottom:10px;left:50%;transform:translateX(-50%);
+  width:200px;height:100px;
+  background:radial-gradient(ellipse,#6b3a1a 55%,#3a1e08 100%);
+  border:4px solid #8b5a2b;border-radius:50%;
+  box-shadow:0 10px 28px rgba(0,0,0,.65);
+}
+.screen:not(#sPick):not(#sQuiz) .seat svg{width:62px;height:62px}
 
 /* ── REVEAL ── */
 .rev-ans-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
@@ -194,13 +331,13 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
 .screen-header .logo-sm span{color:var(--orange)}
 
 @media(max-width:480px){
-  .ans-grid,.rev-ans-grid,.cat-grid,.diff-pick-grid{grid-template-columns:1fr}
+  .ans-grid,.rev-ans-grid,.cat-grid{grid-template-columns:1fr}
   .room-code{font-size:2.4rem}
   .avatar-grid{grid-template-columns:repeat(5,1fr)}
   .avatar-opt svg{width:36px;height:36px}
-  .pub-scene{height:220px}
   .logo{font-size:2.6rem}
   .home-grid{grid-template-columns:1fr}
+  .seat svg{width:55px;height:55px}
 }
 </style>
 </head>
@@ -297,50 +434,75 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
 
 <!-- ══ PICK SCREEN ══ -->
 <div class="screen" id="sPick">
-  <div class="screen-header">
-    <div class="logo-sm">🎬 Cine<span>Quiz</span></div>
-    <button class="btn-exit" onclick="goHome()">✕ Verlassen</button>
-  </div>
-  <div class="pub-scene" id="pickScene"><div class="round-table"></div></div>
-  <div class="pick-banner" id="pickBanner">
-    <div class="pb-title" id="pickTitle">Du bist dran!</div>
-    <div class="pb-sub" id="pickSub">Runde 1 von 10</div>
-  </div>
-  <div class="card" id="pickControls">
-    <h2>🎯 Kategorie wählen</h2>
-    <div class="cat-grid" id="pickCatGrid"></div>
-    <h2 style="margin-top:16px">⚡ Schwierigkeitsgrad</h2>
-    <div class="diff-pick-grid" id="pickDiffGrid"></div>
-    <div style="margin-top:16px">
-      <button class="btn btn-gold" id="pickConfirmBtn" onclick="confirmPick()">🎲 Frage generieren!</button>
+  <!-- Full-bleed pub scene -->
+  <div class="room-scene">
+    <div id="pickScene" style="position:absolute;inset:0;">
+      <div class="round-table"><div class="drinks">🍺 🥃 🍻</div></div>
     </div>
   </div>
-  <div class="info-box" id="pickWait" style="display:none"><span class="sdot"></span>Warte auf den aktiven Spieler...</div>
+  <!-- Top HUD -->
+  <div class="room-hud">
+    <div class="logo-sm">🎬 Cine<span>Quiz</span></div>
+    <div class="hud-right">
+      <div class="hud-round" id="pickSub">Runde 1 von 10</div>
+    </div>
+  </div>
+  <!-- Bottom sheet controls -->
+  <div class="bottom-sheet pick-bottom" id="pickControls">
+    <div class="pick-top-bar">
+      <div class="pb-title" id="pickTitle">🎯 Du bist dran!</div>
+    </div>
+    <div class="cat-strip" id="pickCatGrid"></div>
+    <div class="diff-strip" id="pickDiffGrid"></div>
+    <button class="btn btn-gold" id="pickConfirmBtn" onclick="confirmPick()" style="border-radius:14px;padding:13px">🎲 Frage generieren!</button>
+  </div>
+  <!-- Wait message -->
+  <div class="bottom-sheet" id="pickWait" style="display:none;padding-top:22px">
+    <div class="pick-wait"><span class="sdot"></span>Warte auf den aktiven Spieler...</div>
+  </div>
+  <!-- Exit -->
+  <button class="btn-exit-room" onclick="goHome()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Verlassen
+  </button>
 </div>
 
 <!-- ══ QUIZ ══ -->
 <div class="screen" id="sQuiz">
-  <div class="screen-header">
+  <!-- Full-bleed pub scene -->
+  <div class="room-scene">
+    <div id="pubScene" style="position:absolute;inset:0;">
+      <div class="round-table"><div class="drinks">🍺 🥃 🍻</div></div>
+    </div>
+  </div>
+  <!-- Top HUD -->
+  <div class="room-hud">
     <div class="logo-sm">🎬 Cine<span>Quiz</span></div>
-    <button class="btn-exit" onclick="goHome()">✕ Verlassen</button>
+    <div class="hud-right">
+      <div class="hud-round">Runde <span id="qNum">1</span>/<span id="qTotal">10</span></div>
+      <div class="hud-score">⭐ <span id="myPts">0</span></div>
+    </div>
   </div>
-  <div class="pub-scene" id="pubScene"><div class="round-table"></div></div>
-  <div class="quiz-header">
-    <div class="q-meta">Runde <span id="qNum">1</span>/<span id="qTotal">10</span></div>
-    <div class="q-score">⭐ <span id="myPts">0</span></div>
+  <!-- Bottom sheet: question + answers -->
+  <div class="bottom-sheet quiz-bottom">
+    <div class="prog"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
+    <div class="timer-row">
+      <div class="t-bar"><div class="t-fill" id="tFill"></div></div>
+      <div class="t-num" id="tNum">20</div>
+    </div>
+    <div class="q-card">
+      <div id="pickerTag"></div>
+      <div class="q-cat" id="qCat"></div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="ans-grid" id="ansGrid"></div>
+    <div class="status-info" id="statusInfo"></div>
   </div>
-  <div class="prog"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-  <div class="timer-row">
-    <div class="t-bar"><div class="t-fill" id="tFill"></div></div>
-    <div class="t-num" id="tNum">20</div>
-  </div>
-  <div class="q-card">
-    <div id="pickerTag"></div>
-    <div class="q-cat" id="qCat"></div>
-    <div class="q-text" id="qText"></div>
-  </div>
-  <div class="ans-grid" id="ansGrid"></div>
-  <div class="status-info" id="statusInfo"></div>
+  <!-- Exit -->
+  <button class="btn-exit-room" onclick="goHome()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Verlassen
+  </button>
 </div>
 
 <!-- ══ REVEAL ══ -->
@@ -349,7 +511,7 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
     <div style="font-size:1.1rem;font-weight:800;color:var(--gold);font-family:'Playfair Display',serif">📊 Auflösung</div>
     <button class="btn-exit" onclick="goHome()">✕ Verlassen</button>
   </div>
-  <div class="pub-scene" id="revealScene"><div class="round-table"></div></div>
+  <div class="pub-scene" id="revealScene"><div class="round-table"><div class="drinks">🍺 🥃 🍻</div></div></div>
   <div class="card" id="revealCard"></div>
   <div class="card"><h2>🏅 Zwischenstand</h2><div id="interimScores"></div></div>
   <div id="revealAction" style="width:100%"></div>
@@ -360,7 +522,7 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   <div style="font-size:4rem" id="finalIcon">🏆</div>
   <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--gold)" id="finalTitle"></div>
   <div style="color:#b07040;font-size:.9rem;margin-bottom:8px;font-weight:700" id="finalSub"></div>
-  <div class="pub-scene" id="finalScene"><div class="round-table"></div></div>
+  <div class="pub-scene" id="finalScene"><div class="round-table"><div class="drinks">🍺 🥃 🍻</div></div></div>
   <div class="card" style="width:100%"><h2>🏆 Endrangliste</h2><div id="finalScores"></div></div>
   <div style="display:flex;gap:10px;width:100%">
     <button class="btn btn-gold" onclick="playAgain()">🔄 Nochmal</button>
@@ -442,12 +604,12 @@ function renderPlayers(players,isHost){
 // ── PICK CONTROLS ─────────────────────────────────────────────────────────────
 function buildPickCats(){
   const g=document.getElementById('pickCatGrid');g.innerHTML='';
-  CATS.forEach(c=>{const b=document.createElement('button');b.className='cat-btn'+(c.id===G.pickCat?' sel':'');b.innerHTML=`<span class="cat-icon">${c.icon}</span>${c.label}`;b.onclick=()=>{G.pickCat=c.id;buildPickCats()};g.appendChild(b)});
+  CATS.forEach(c=>{const b=document.createElement('button');b.className='cat-chip'+(c.id===G.pickCat?' sel':'');b.innerHTML=`${c.icon} ${c.label}`;b.onclick=()=>{G.pickCat=c.id;buildPickCats()};g.appendChild(b)});
 }
 function buildPickDiffs(){
   const g=document.getElementById('pickDiffGrid');g.innerHTML='';
-  DIFFS.forEach(d=>{const b=document.createElement('div');b.className=`diff-card d${d.id}`+(G.pickDiff===d.id?' sel':'');
-    b.innerHTML=`<div class="dc-icon">${d.icon}</div><div class="dc-name">${d.label}</div><div class="dc-pts">Alle: +${d.base} | ${d.desc}</div>`;
+  DIFFS.forEach(d=>{const b=document.createElement('div');b.className=`diff-chip d${d.id}`+(G.pickDiff===d.id?' sel':'');
+    b.innerHTML=`${d.icon} ${d.label}<div style="font-size:.65rem;opacity:.7;margin-top:2px">+${d.base} Pkt</div>`;
     b.onclick=()=>{G.pickDiff=d.id;buildPickDiffs()};g.appendChild(b)});
 }
 
