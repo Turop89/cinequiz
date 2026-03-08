@@ -8,152 +8,140 @@
 <script src="https://js.pusher.com/8.2.0/pusher.min.js"></script>
 <style>
 :root{
-  --gold:#f5c518;--dark:#1a0a00;--card:#1e1206;
+  --gold:#f5c518;--dark:#0d1a1a;--card:#0a1414;
   --accent:#e94560;--text:#f0e6d3;--green:#2ecc71;--red:#e74c3c;
-  --blue:#3498db;--orange:#ff883e;--border:#5a3010;
+  --blue:#3498db;--orange:#ff883e;--border:#2a6060;
+  --teal:#1e7070;--teal2:#246868;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow-x:hidden;padding:16px}
 
-/* ── GLOBAL NON-ROOM BACKGROUND ── */
-.pub-bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:#1a0800}
-.pub-bg::before{content:'';position:absolute;inset:0;background:
-  radial-gradient(ellipse 80% 50% at 50% 0%,rgba(180,80,10,.2) 0%,transparent 65%),
-  linear-gradient(180deg,#180600 0%,#2d1408 50%,#1a0900 100%)}
-.pub-wall{position:absolute;top:0;left:0;right:0;height:65%;background:linear-gradient(180deg,#200900 0%,#3a1a0a 100%)}
-.pub-floor{position:absolute;bottom:0;left:0;right:0;height:38%;background:linear-gradient(180deg,#3a1a0a 0%,#200d04 100%);border-top:3px solid #5a3010}
-.bar-counter{position:absolute;bottom:36%;left:0;right:0;height:5%;background:linear-gradient(180deg,#7a4a1f 0%,#5a3010 60%,#3a1e08 100%);border-top:4px solid #9a6230;z-index:2}
-.shelf{position:absolute;background:linear-gradient(180deg,#5a3010,#3a1e08);height:7px;border-radius:2px;z-index:3}
-.shelf1{top:10%;left:4%;right:54%}.shelf2{top:26%;left:4%;right:54%}.shelf3{top:10%;left:58%;right:4%}.shelf4{top:26%;left:58%;right:4%}
-.mirror{position:absolute;top:4%;left:26%;right:26%;height:54%;background:linear-gradient(135deg,rgba(255,200,120,.04),rgba(255,160,60,.07),rgba(255,200,120,.04));border:5px solid #5a3010;border-radius:4px;z-index:2}
-.mirror::before{content:'QUIZ PUB';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:rgba(245,197,24,.2);letter-spacing:6px}
-.lantern{position:absolute;z-index:5}
-.lantern-body{width:22px;height:30px;background:radial-gradient(ellipse,rgba(255,150,40,.95),rgba(180,80,15,.75));border:2px solid #7a4a1f;border-radius:4px;box-shadow:0 0 22px rgba(255,130,20,.7),0 0 50px rgba(255,90,10,.25)}
-.lantern::before{content:'';position:absolute;top:-10px;left:50%;transform:translateX(-50%);width:2px;height:12px;background:#5a3010}
-.l1{top:2%;left:9%}.l2{top:2%;right:9%}.l3{top:2%;left:44%}
-.irish-stripe{position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,#169b62 33%,#fff 33%,#fff 66%,#ff883e 66%);opacity:.2}
-.irish-stripe2{position:absolute;top:0;right:0;width:4px;height:100%;background:linear-gradient(180deg,#169b62 33%,#fff 33%,#fff 66%,#ff883e 66%);opacity:.2}
+/* ── GLOBAL BG (matches casino room palette for lobby screens) ── */
+.pub-bg{position:fixed;inset:0;z-index:0;overflow:hidden;background:#0d1a1a}
+.pub-bg::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 70% 60% at 50% 30%,rgba(30,150,130,.15) 0%,transparent 70%),
+  linear-gradient(160deg,#0a1818 0%,#1a3a3a 40%,#0d1a1a 100%)}
+.bg-wall{position:absolute;top:0;left:0;right:0;height:60%;background:linear-gradient(180deg,#0d3a3a 0%,#1a5050 100%);opacity:.8}
+.bg-wood{position:absolute;top:0;left:0;width:14%;height:100%;background:linear-gradient(90deg,#3a1a08,#5a2e10);opacity:.6}
+.bg-wood2{position:absolute;top:0;right:0;width:14%;height:100%;background:linear-gradient(270deg,#3a1a2a,#5a2040);opacity:.6}
+.bg-floor{position:absolute;bottom:0;left:0;right:0;height:42%;background:linear-gradient(180deg,#0d2030 0%,#081520 100%)}
 
 /* ── SCREENS ── */
 .screen{display:none;width:100%;max-width:720px;position:relative;z-index:10;flex-direction:column;align-items:center;gap:14px}
 .screen.active{display:flex}
-.card{background:rgba(22,10,2,.92);border-radius:18px;padding:20px;width:100%;border:1px solid var(--border);box-shadow:0 6px 30px rgba(0,0,0,.55),inset 0 1px 0 rgba(255,200,100,.06)}
+.card{background:rgba(8,20,20,.93);border-radius:18px;padding:20px;width:100%;border:1px solid var(--border);box-shadow:0 6px 30px rgba(0,0,0,.6),inset 0 1px 0 rgba(30,200,180,.07)}
 .card h2{color:var(--gold);font-size:.88rem;margin-bottom:14px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800}
 
 /* ── HOME ── */
 .logo{font-family:'Playfair Display',serif;font-size:3.4rem;font-weight:900;color:var(--gold);text-shadow:0 0 40px rgba(245,197,24,.5),0 2px 0 rgba(0,0,0,.5);letter-spacing:3px;line-height:1}
 .logo span{color:var(--orange)}
-.tagline{color:#b07040;font-size:.78rem;letter-spacing:4px;margin-top:6px;text-transform:uppercase}
+.tagline{color:#5a9090;font-size:.78rem;letter-spacing:4px;margin-top:6px;text-transform:uppercase}
 .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%}
 @media(max-width:540px){.home-grid{grid-template-columns:1fr}}
-.home-panel{background:rgba(22,10,2,.9);border-radius:18px;padding:22px;border:1px solid var(--border);box-shadow:0 6px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:12px}
+.home-panel{background:rgba(8,20,20,.9);border-radius:18px;padding:22px;border:1px solid #2a5050;box-shadow:0 6px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:12px}
 .home-panel-title{display:flex;align-items:center;gap:9px;margin-bottom:2px}
 .home-panel-title .icon{font-size:1.4rem}
 .home-panel-title h2{font-family:'Playfair Display',serif;font-size:1.05rem;color:var(--gold);font-weight:700}
-.home-panel-sub{font-size:.75rem;color:#7a5030;margin-bottom:4px}
-
-.inp{padding:13px 16px;background:rgba(0,0,0,.45);border:1.5px solid #3a2008;border-radius:12px;color:var(--text);font-size:.95rem;font-family:'Nunito',sans-serif;width:100%;transition:border-color .2s,box-shadow .2s}
+.home-panel-sub{font-size:.75rem;color:#3a7070;margin-bottom:4px}
+.inp{padding:13px 16px;background:rgba(0,0,0,.5);border:1.5px solid #1a4040;border-radius:12px;color:var(--text);font-size:.95rem;font-family:'Nunito',sans-serif;width:100%;transition:border-color .2s,box-shadow .2s}
 .inp:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,197,24,.1)}
-.inp::placeholder{color:#5a3a20}
+.inp::placeholder{color:#2a5050}
 .btn{padding:13px 28px;border:none;border-radius:30px;font-size:.95rem;font-weight:800;cursor:pointer;transition:all .25s;width:100%;font-family:'Nunito',sans-serif}
 .btn-gold{background:linear-gradient(135deg,#f5c518,#d4a012);color:#000;box-shadow:0 4px 18px rgba(245,197,24,.28)}
 .btn-gold:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(245,197,24,.45)}
-.btn-outline{background:transparent;color:var(--gold);border:2px solid #3a2008}
+.btn-outline{background:transparent;color:var(--gold);border:2px solid #2a4040}
 .btn-outline:hover{border-color:var(--gold);background:rgba(245,197,24,.08)}
 .btn-sm{width:auto;padding:10px 22px;font-size:.88rem}
 .btn-exit{background:rgba(231,76,60,.12);color:var(--red);border:1.5px solid rgba(231,76,60,.3);border-radius:20px;padding:8px 18px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;transition:all .2s}
 .btn-exit:hover{background:rgba(231,76,60,.22);border-color:var(--red)}
-
-/* ── LOBBY ── */
 .room-code{font-family:'Playfair Display',serif;font-size:3.2rem;font-weight:900;color:var(--gold);letter-spacing:10px;text-align:center;padding:16px 0;text-shadow:0 0 25px rgba(245,197,24,.45)}
 .players-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:9px;width:100%}
-.p-chip{background:rgba(0,0,0,.4);border:1.5px solid var(--border);border-radius:12px;padding:10px 13px;display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600}
+.p-chip{background:rgba(0,0,0,.4);border:1.5px solid #2a5050;border-radius:12px;padding:10px 13px;display:flex;align-items:center;gap:8px;font-size:.85rem;font-weight:600}
 .p-chip.host{border-color:var(--gold)}.p-chip svg{width:28px;height:28px;flex-shrink:0}
 .badge{padding:2px 8px;border-radius:20px;font-size:.63rem;font-weight:800;background:var(--gold);color:#000;margin-left:3px}
 .cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.cat-btn{padding:13px 8px;background:rgba(0,0,0,.35);border:1.5px solid var(--border);border-radius:13px;color:var(--text);font-size:.8rem;cursor:pointer;transition:all .2s;text-align:center;font-family:'Nunito',sans-serif;font-weight:700}
+.cat-btn{padding:13px 8px;background:rgba(0,0,0,.35);border:1.5px solid #2a5050;border-radius:13px;color:var(--text);font-size:.8rem;cursor:pointer;transition:all .2s;text-align:center;font-family:'Nunito',sans-serif;font-weight:700}
 .cat-btn:hover,.cat-btn.sel{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.08)}
 .cat-icon{font-size:1.5rem;display:block;margin-bottom:4px}
 .row3{display:flex;gap:8px;width:100%}
-.opt-btn{flex:1;padding:10px;background:rgba(0,0,0,.35);border:1.5px solid var(--border);border-radius:11px;color:#b07040;font-size:.8rem;cursor:pointer;transition:all .2s;text-align:center;font-family:'Nunito',sans-serif;font-weight:700}
+.opt-btn{flex:1;padding:10px;background:rgba(0,0,0,.35);border:1.5px solid #2a5050;border-radius:11px;color:#4a8080;font-size:.8rem;cursor:pointer;transition:all .2s;text-align:center;font-family:'Nunito',sans-serif;font-weight:700}
 .opt-btn.sel{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.08)}
 .avatar-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;width:100%}
-.avatar-opt{background:rgba(0,0,0,.3);border:2px solid var(--border);border-radius:13px;padding:8px 4px;cursor:pointer;transition:all .2s;text-align:center}
+.avatar-opt{background:rgba(0,0,0,.3);border:2px solid #2a5050;border-radius:13px;padding:8px 4px;cursor:pointer;transition:all .2s;text-align:center}
 .avatar-opt:hover,.avatar-opt.sel{border-color:var(--gold);background:rgba(245,197,24,.1);transform:translateY(-2px)}
 .avatar-opt svg{width:44px;height:44px;display:block;margin:0 auto 3px}
-.avatar-opt .aname{font-size:.6rem;color:#b07040;font-weight:700}
+.avatar-opt .aname{font-size:.6rem;color:#4a8080;font-weight:700}
 .screen-header{display:flex;align-items:center;justify-content:space-between;width:100%}
 .screen-header .logo-sm{font-family:'Playfair Display',serif;font-size:1.8rem;font-weight:900;color:var(--gold)}
 .screen-header .logo-sm span{color:var(--orange)}
 .sdot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:6px;animation:pulse 1.5s infinite}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 
-/* ── ROOM SCREENS — full-viewport bar scene ── */
-#sPick,#sQuiz{
-  position:fixed;inset:0;max-width:100%;padding:0;gap:0;
-  justify-content:flex-start;overflow:hidden;z-index:10;
-}
+/* ══ ROOM SCREENS — full casino room ══ */
+#sPick,#sQuiz{position:fixed;inset:0;max-width:100%;padding:0;gap:0;justify-content:flex-start;overflow:hidden;z-index:10}
 
-/* The SVG bar illustration fills the full screen */
-.bar-scene{
-  position:absolute;inset:0;width:100%;height:100%;
-  overflow:hidden;
-}
-.bar-scene svg{width:100%;height:100%;display:block;}
+/* SVG room scene fills entire screen */
+.room-scene-wrap{position:absolute;inset:0;width:100%;height:100%;overflow:hidden}
+.room-scene-wrap svg{width:100%;height:100%;display:block}
 
-/* Characters sit on top of the bar scene */
-.chars-layer{
-  position:absolute;inset:0;pointer-events:none;
-}
-.seat{position:absolute;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .3s;pointer-events:none}
-.seat svg{width:68px;height:68px;filter:drop-shadow(0 6px 14px rgba(0,0,0,.8))}
-.seat .sname{font-size:.6rem;color:#f5e8d0;background:rgba(0,0,0,.8);backdrop-filter:blur(4px);padding:2px 7px;border-radius:8px;white-space:nowrap;max-width:76px;overflow:hidden;text-overflow:ellipsis;text-align:center;font-weight:700;border:1px solid rgba(255,160,40,.2)}
-.seat .sbadge{font-size:.82rem;position:absolute;top:-5px;right:-5px}
-.seat.is-picker svg{filter:drop-shadow(0 0 14px rgba(245,197,24,1));animation:glow 1.5s ease infinite alternate}
-@keyframes glow{0%{filter:drop-shadow(0 0 6px rgba(245,197,24,.7))}100%{filter:drop-shadow(0 0 22px rgba(245,197,24,1))}}
-.seat.jubel svg{animation:jubel .5s ease infinite alternate}
-@keyframes jubel{0%{transform:translateY(0) rotate(-6deg) scale(1)}100%{transform:translateY(-16px) rotate(6deg) scale(1.2)}}
+/* Character avatars layer — absolutely positioned on top of SVG */
+.chars-layer{position:absolute;inset:0;pointer-events:none;overflow:visible}
 
-/* HUD pinned top */
-.room-hud{
-  position:absolute;top:0;left:0;right:0;z-index:30;
-  display:flex;align-items:center;justify-content:space-between;
-  padding:10px 16px 10px;
-  background:linear-gradient(180deg,rgba(8,3,0,.92) 0%,rgba(8,3,0,0) 100%);
+/* Each character: avatar SVG + nameplate, both inside a .seat div */
+.seat{
+  position:absolute;
+  display:flex;flex-direction:column;align-items:center;
+  gap:0px;
+  pointer-events:none;
+  transform:translate(-50%,-100%); /* anchor bottom-center of avatar on chair seat */
 }
+.seat .av-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+.seat .av-wrap svg{display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.85))}
+.seat .sbadge{font-size:.85rem;position:absolute;top:-4px;right:-4px;z-index:2}
+.seat .sname{
+  font-size:.58rem;color:#f5ead0;
+  background:rgba(0,0,0,.82);backdrop-filter:blur(6px);
+  padding:2px 7px;border-radius:8px;
+  white-space:nowrap;max-width:80px;overflow:hidden;text-overflow:ellipsis;
+  text-align:center;font-weight:800;
+  border:1px solid rgba(245,197,24,.2);
+  margin-top:2px;
+}
+.seat.is-picker .av-wrap svg{filter:drop-shadow(0 0 16px rgba(245,197,24,1));animation:glow 1.5s ease infinite alternate}
+@keyframes glow{0%{filter:drop-shadow(0 0 6px rgba(245,197,24,.7))}100%{filter:drop-shadow(0 0 24px rgba(245,197,24,1))}}
+.seat.jubel .av-wrap{animation:jubel .5s ease infinite alternate}
+@keyframes jubel{0%{transform:translateY(0) rotate(-5deg) scale(1)}100%{transform:translateY(-14px) rotate(5deg) scale(1.18)}}
+
+/* HUD */
+.room-hud{position:absolute;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:linear-gradient(180deg,rgba(5,12,12,.95) 0%,rgba(5,12,12,0) 100%)}
 .room-hud .logo-sm{font-family:'Playfair Display',serif;font-size:1.5rem;font-weight:900;color:var(--gold);text-shadow:0 0 20px rgba(245,197,24,.5)}
 .room-hud .logo-sm span{color:var(--orange)}
 .hud-right{display:flex;align-items:center;gap:8px}
-.hud-score{font-weight:800;color:var(--gold);font-size:.9rem;background:rgba(0,0,0,.6);padding:4px 12px;border-radius:20px;border:1px solid rgba(245,197,24,.3);backdrop-filter:blur(4px)}
-.hud-round{font-size:.75rem;color:#c4956a;font-weight:700;background:rgba(0,0,0,.5);padding:4px 10px;border-radius:20px;backdrop-filter:blur(4px)}
+.hud-score{font-weight:800;color:var(--gold);font-size:.9rem;background:rgba(0,0,0,.7);padding:4px 12px;border-radius:20px;border:1px solid rgba(245,197,24,.3);backdrop-filter:blur(4px)}
+.hud-round{font-size:.75rem;color:#80c0b0;font-weight:700;background:rgba(0,0,0,.6);padding:4px 10px;border-radius:20px;backdrop-filter:blur(4px)}
 
-/* Bottom sheet */
-.bottom-sheet{
-  position:absolute;bottom:0;left:0;right:0;z-index:25;
-  background:linear-gradient(180deg,rgba(8,3,0,0) 0%,rgba(8,3,0,.96) 14%,rgba(8,3,0,1) 100%);
-  padding:0 12px 12px;
-  display:flex;flex-direction:column;gap:7px;
-}
-.pick-bottom{padding-top:24px}
+/* Bottom sheet overlay */
+.bottom-sheet{position:absolute;bottom:0;left:0;right:0;z-index:25;background:linear-gradient(180deg,rgba(5,15,15,0) 0%,rgba(5,15,15,.97) 13%,#050f0f 100%);padding:0 12px 12px;display:flex;flex-direction:column;gap:7px}
+.pick-bottom{padding-top:22px}
 .pb-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:900;color:var(--gold);text-align:center;padding-bottom:8px}
 .cat-strip{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
 .cat-strip::-webkit-scrollbar{display:none}
-.cat-chip{flex-shrink:0;padding:7px 13px;background:rgba(0,0,0,.6);border:1.5px solid #3a1e08;border-radius:20px;color:#c4956a;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'Nunito',sans-serif;backdrop-filter:blur(4px)}
+.cat-chip{flex-shrink:0;padding:7px 13px;background:rgba(0,0,0,.65);border:1.5px solid #1a4040;border-radius:20px;color:#5a9090;font-size:.78rem;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:'Nunito',sans-serif;backdrop-filter:blur(4px)}
 .cat-chip.sel{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.14)}
 .diff-strip{display:flex;gap:6px}
-.diff-chip{flex:1;padding:9px 6px;background:rgba(0,0,0,.6);border:1.5px solid #3a1e08;border-radius:12px;color:#c4956a;font-size:.8rem;font-weight:800;cursor:pointer;transition:all .2s;text-align:center;font-family:'Nunito',sans-serif;backdrop-filter:blur(4px)}
+.diff-chip{flex:1;padding:9px 6px;background:rgba(0,0,0,.65);border:1.5px solid #1a4040;border-radius:12px;color:#5a9090;font-size:.8rem;font-weight:800;cursor:pointer;transition:all .2s;text-align:center;font-family:'Nunito',sans-serif;backdrop-filter:blur(4px)}
 .diff-chip.d0.sel,.diff-chip.d0:hover{border-color:var(--green);color:var(--green);background:rgba(46,204,113,.12)}
 .diff-chip.d1.sel,.diff-chip.d1:hover{border-color:var(--gold);color:var(--gold);background:rgba(245,197,24,.12)}
 .diff-chip.d2.sel,.diff-chip.d2:hover{border-color:var(--red);color:var(--red);background:rgba(231,76,60,.12)}
-.pick-wait{text-align:center;padding:14px;background:rgba(52,152,219,.08);border:1px solid rgba(52,152,219,.2);border-radius:14px;color:var(--blue);font-size:.85rem;font-weight:600}
-.quiz-bottom{padding-top:14px}
+.pick-wait{text-align:center;padding:14px;background:rgba(30,100,100,.12);border:1px solid rgba(30,150,150,.25);border-radius:14px;color:#50c0c0;font-size:.85rem;font-weight:600}
+.quiz-bottom{padding-top:12px}
 .prog{width:100%;background:rgba(255,255,255,.07);border-radius:10px;height:4px;overflow:hidden;margin-bottom:2px}
 .prog-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--orange));border-radius:10px;transition:width .5s}
 .timer-row{width:100%;display:flex;align-items:center;gap:8px;margin-bottom:4px}
 .t-bar{flex:1;background:rgba(255,255,255,.07);border-radius:10px;height:7px;overflow:hidden}
 .t-fill{height:100%;border-radius:10px;transition:width .1s linear,background .4s}
 .t-num{font-size:.95rem;font-weight:800;min-width:26px;text-align:right;color:var(--gold)}
-.q-card{background:rgba(10,5,0,.9);border-radius:14px;padding:13px 15px;width:100%;border:1px solid rgba(90,48,16,.55);backdrop-filter:blur(10px)}
+.q-card{background:rgba(5,15,15,.93);border-radius:14px;padding:13px 15px;width:100%;border:1px solid rgba(30,100,100,.5);backdrop-filter:blur(12px)}
 .q-cat{font-size:.6rem;color:var(--orange);text-transform:uppercase;letter-spacing:2px;margin-bottom:4px;font-weight:800}
 .q-text{font-size:1rem;line-height:1.5;font-weight:700}
 .picker-tag{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.67rem;font-weight:700;margin-bottom:5px}
@@ -161,49 +149,35 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
 .tag-gold{background:rgba(245,197,24,.18);border:1px solid var(--gold);color:var(--gold)}
 .tag-red{background:rgba(231,76,60,.18);border:1px solid var(--red);color:var(--red)}
 .ans-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;width:100%}
-.ans-btn{padding:11px 12px;background:rgba(0,0,0,.65);border:1.5px solid rgba(90,48,16,.55);border-radius:12px;color:var(--text);font-size:.84rem;cursor:pointer;transition:all .2s;text-align:left;line-height:1.35;font-family:'Nunito',sans-serif;font-weight:600;backdrop-filter:blur(6px)}
+.ans-btn{padding:11px 12px;background:rgba(0,0,0,.7);border:1.5px solid rgba(30,100,100,.5);border-radius:12px;color:var(--text);font-size:.84rem;cursor:pointer;transition:all .2s;text-align:left;line-height:1.35;font-family:'Nunito',sans-serif;font-weight:600;backdrop-filter:blur(8px)}
 .ans-btn:hover:not(:disabled){border-color:var(--gold);background:rgba(245,197,24,.1);transform:translateY(-2px)}
 .ans-btn.chosen{border-color:var(--blue);background:rgba(52,152,219,.2);color:#7ec8e3}
 .ans-btn.correct{background:rgba(46,204,113,.2);border-color:var(--green);color:var(--green)}
 .ans-btn.wrong{background:rgba(231,76,60,.15);border-color:var(--red);color:#e88}
 .ans-btn:disabled{cursor:default}
-.status-info{text-align:center;font-size:.82rem;color:#c4956a;min-height:18px;width:100%;font-weight:700}
+.status-info{text-align:center;font-size:.82rem;color:#50a0a0;min-height:18px;width:100%;font-weight:700}
 
-/* Exit button — bottom right */
-.btn-exit-room{
-  position:absolute;bottom:16px;right:14px;z-index:35;
-  background:rgba(50,10,5,.88);
-  color:rgba(220,100,80,.92);
-  border:1px solid rgba(160,50,30,.4);
-  border-radius:50px;padding:8px 16px 8px 12px;
-  font-size:.74rem;font-weight:800;cursor:pointer;
-  font-family:'Nunito',sans-serif;
-  display:flex;align-items:center;gap:6px;
-  transition:all .25s;backdrop-filter:blur(8px);
-  box-shadow:0 4px 20px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,100,60,.1);
-  letter-spacing:.5px;
-}
-.btn-exit-room:hover{background:rgba(120,25,10,.8);border-color:rgba(231,76,60,.6);color:#ff8060;transform:translateY(-1px);box-shadow:0 6px 24px rgba(0,0,0,.7)}
+/* Exit button */
+.btn-exit-room{position:absolute;bottom:16px;right:14px;z-index:35;background:rgba(10,30,30,.9);color:rgba(200,80,60,.92);border:1px solid rgba(120,40,30,.45);border-radius:50px;padding:8px 16px 8px 12px;font-size:.74rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;display:flex;align-items:center;gap:6px;transition:all .25s;backdrop-filter:blur(8px);box-shadow:0 4px 20px rgba(0,0,0,.6);letter-spacing:.5px}
+.btn-exit-room:hover{background:rgba(100,20,10,.8);border-color:rgba(231,76,60,.6);color:#ff8060;transform:translateY(-1px)}
 .btn-exit-room svg{width:14px;height:14px;flex-shrink:0}
 
-/* ── Legacy pub-scene for lobby/reveal/final ── */
-.pub-scene{width:100%;position:relative;height:260px;margin-bottom:4px;flex-shrink:0;overflow:hidden;border-radius:16px}
-.pub-scene svg.scene-svg{width:100%;height:100%;display:block}
-.pub-scene .seat svg{width:56px;height:56px}
+/* ── Legacy scene container (reveal/final/lobby) ── */
+.pub-scene{width:100%;position:relative;height:260px;margin-bottom:4px;flex-shrink:0;overflow:hidden;border-radius:16px;background:#0a2020}
+.pub-scene svg.scene-svg{position:absolute;inset:0;width:100%;height:100%}
+.pub-scene .seat .av-wrap svg{width:50px;height:50px}
 
 /* ── REVEAL ── */
 .rev-ans-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:13px}
-.rev-ans{padding:10px 13px;border-radius:11px;font-size:.83rem;border:1.5px solid var(--border);font-weight:600}
+.rev-ans{padding:10px 13px;border-radius:11px;font-size:.83rem;border:1.5px solid #2a5050;font-weight:600}
 .rev-ans.correct{border-color:var(--green);background:rgba(46,204,113,.1);color:var(--green)}
-.rev-ans.wrong{border-color:#3a2008;background:rgba(0,0,0,.2);color:#666}
+.rev-ans.wrong{border-color:#1a4040;background:rgba(0,0,0,.2);color:#555}
 .chips{display:flex;flex-wrap:wrap;gap:7px}
 .chip{padding:4px 12px;border-radius:20px;font-size:.78rem;font-weight:700}
 .chip.ok{background:rgba(46,204,113,.18);border:1px solid var(--green);color:var(--green)}
 .chip.nok{background:rgba(231,76,60,.18);border:1px solid var(--red);color:var(--red)}
-.chip.skip{background:#110900;border:1px solid #3a2008;color:#555}
-
-/* ── SCORES ── */
-.s-row{display:flex;align-items:center;gap:11px;padding:11px 15px;background:rgba(0,0,0,.35);border-radius:13px;margin-bottom:8px;border:1px solid var(--border)}
+.chip.skip{background:#050f0f;border:1px solid #1a4040;color:#444}
+.s-row{display:flex;align-items:center;gap:11px;padding:11px 15px;background:rgba(0,0,0,.35);border-radius:13px;margin-bottom:8px;border:1px solid #2a5050}
 .s-row.r1{border-color:var(--gold);background:rgba(245,197,24,.07)}
 .s-row.r2{border-color:#aaa;background:rgba(200,200,200,.04)}
 .s-row.r3{border-color:#cd7f32;background:rgba(205,127,50,.04)}
@@ -211,12 +185,10 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
 .rank{font-size:1.2rem;min-width:28px;text-align:center}
 .sname{flex:1;font-weight:700;font-size:.9rem}
 .spts{font-weight:800;color:var(--gold)}
-.scor{font-size:.72rem;color:#b07040}
-
-/* ── MISC ── */
-.info-box{background:rgba(52,152,219,.08);border:1px solid rgba(52,152,219,.3);border-radius:12px;padding:12px 18px;font-size:.85rem;color:var(--blue);width:100%;text-align:center;font-weight:600}
+.scor{font-size:.72rem;color:#4a8080}
+.info-box{background:rgba(30,100,100,.1);border:1px solid rgba(30,150,150,.3);border-radius:12px;padding:12px 18px;font-size:.85rem;color:#50c0c0;width:100%;text-align:center;font-weight:600}
 .err-box{background:rgba(231,76,60,.1);border:1px solid var(--red);border-radius:12px;padding:12px 18px;font-size:.85rem;color:var(--red);width:100%;text-align:center}
-.spinner{width:46px;height:46px;border:4px solid #3a2008;border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+.spinner{width:46px;height:46px;border:4px solid #1a4040;border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .confetti-piece{position:fixed;width:10px;height:10px;top:-20px;animation:cfall linear forwards;z-index:999;border-radius:2px}
 @keyframes cfall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(110vh) rotate(720deg);opacity:0}}
@@ -228,27 +200,19 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   .avatar-opt svg{width:36px;height:36px}
   .logo{font-size:2.5rem}
   .home-grid{grid-template-columns:1fr}
-  .seat svg{width:54px;height:54px}
 }
 </style>
 </head>
 <body>
 
-<!-- ── GLOBAL BG for non-room screens ── -->
+<!-- Global BG -->
 <div class="pub-bg">
-  <div class="pub-wall"></div>
-  <div class="mirror"></div>
-  <div class="shelf shelf1"></div><div class="shelf shelf2"></div>
-  <div class="shelf shelf3"></div><div class="shelf shelf4"></div>
-  <div class="lantern l1"><div class="lantern-body"></div></div>
-  <div class="lantern l2"><div class="lantern-body"></div></div>
-  <div class="lantern l3"><div class="lantern-body"></div></div>
-  <div class="bar-counter"></div>
-  <div class="pub-floor"></div>
-  <div class="irish-stripe"></div><div class="irish-stripe2"></div>
+  <div class="bg-wall"></div>
+  <div class="bg-wood"></div><div class="bg-wood2"></div>
+  <div class="bg-floor"></div>
 </div>
 
-<!-- ══ HOME ══ -->
+<!-- HOME -->
 <div class="screen active" id="sHome">
   <div style="text-align:center;padding:10px 0 4px">
     <div class="logo">🎬 Cine<span>Quiz</span></div>
@@ -259,7 +223,7 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
       <div class="home-panel-title"><div class="icon">👑</div><h2>Raum erstellen</h2></div>
       <div class="home-panel-sub">Erstelle einen Raum und lade Freunde ein</div>
       <input class="inp" id="hostName" placeholder="Dein Name" maxlength="15">
-      <button class="btn btn-gold" onclick="createRoom()">🍺 Raum erstellen</button>
+      <button class="btn btn-gold" onclick="createRoom()">🃏 Raum erstellen</button>
     </div>
     <div class="home-panel">
       <div class="home-panel-title"><div class="icon">🎟️</div><h2>Raum beitreten</h2></div>
@@ -273,7 +237,7 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   <div id="homeErr" style="width:100%"></div>
 </div>
 
-<!-- ══ LOBBY HOST ══ -->
+<!-- LOBBY HOST -->
 <div class="screen" id="sLobbyHost">
   <div class="screen-header">
     <div class="logo-sm">🎬 Cine<span>Quiz</span></div>
@@ -282,7 +246,7 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   <div class="card" style="text-align:center">
     <h2>📡 Raum-Code</h2>
     <div class="room-code" id="displayCode">------</div>
-    <div style="color:#7a5030;font-size:.82rem;font-weight:600">Teile diesen Code mit deinen Freunden</div>
+    <div style="color:#3a7070;font-size:.82rem;font-weight:600">Teile diesen Code mit deinen Freunden</div>
   </div>
   <div class="card"><h2>👥 Spieler (<span id="hostPCount">1</span>/8)</h2><div class="players-grid" id="hostPlayers"></div></div>
   <div class="card"><h2>🎯 Standard-Kategorie</h2><div class="cat-grid" id="catGrid"></div></div>
@@ -291,7 +255,7 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   <button class="btn btn-gold" onclick="startGame()">▶ Spiel starten</button>
 </div>
 
-<!-- ══ LOBBY GUEST ══ -->
+<!-- LOBBY GUEST -->
 <div class="screen" id="sLobbyGuest">
   <div class="screen-header">
     <div class="logo-sm">🎬 Cine<span>Quiz</span></div>
@@ -300,35 +264,27 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   <div class="card" style="text-align:center">
     <h2>📡 Raum</h2>
     <div class="room-code" id="guestCode">------</div>
-    <div style="color:#7a5030;font-size:.82rem;font-weight:600"><span class="sdot"></span>Warte auf Spielleiter...</div>
+    <div style="color:#3a7070;font-size:.82rem;font-weight:600"><span class="sdot"></span>Warte auf Spielleiter...</div>
   </div>
   <div class="card"><h2>👥 Spieler (<span id="guestPCount">0</span>/8)</h2><div class="players-grid" id="guestPlayers"></div></div>
-  <div class="info-box">Der Spielleiter startet das Spiel. Mach dich bereit! 🍺</div>
+  <div class="info-box">Der Spielleiter startet das Spiel. Mach dich bereit! 🃏</div>
 </div>
 
-<!-- ══ LOADING ══ -->
+<!-- LOADING -->
 <div class="screen" id="sLoading">
   <div style="font-size:3rem">🤖</div>
   <div class="spinner"></div>
-  <div style="color:#b07040;text-align:center;font-size:.9rem;font-weight:700">Generiere Frage...</div>
+  <div style="color:#4a8080;text-align:center;font-size:.9rem;font-weight:700">Generiere Frage...</div>
 </div>
 
-<!-- ══ PICK SCREEN ══ -->
+<!-- PICK SCREEN -->
 <div class="screen" id="sPick">
-  <!-- Bar illustration fills entire screen -->
-  <div class="bar-scene" id="pickBarScene">
-    <!-- SVG drawn by JS -->
-  </div>
-  <!-- Characters layer -->
+  <div class="room-scene-wrap" id="pickRoomSvg"></div>
   <div class="chars-layer" id="pickScene"></div>
-  <!-- HUD top -->
   <div class="room-hud">
     <div class="logo-sm">🎬 Cine<span>Quiz</span></div>
-    <div class="hud-right">
-      <div class="hud-round" id="pickSub">Runde 1 von 10</div>
-    </div>
+    <div class="hud-right"><div class="hud-round" id="pickSub">Runde 1 von 10</div></div>
   </div>
-  <!-- Bottom controls -->
   <div class="bottom-sheet pick-bottom" id="pickControls">
     <div class="pb-title" id="pickTitle">🎯 Du bist dran!</div>
     <div class="cat-strip" id="pickCatGrid"></div>
@@ -344,9 +300,9 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   </button>
 </div>
 
-<!-- ══ QUIZ ══ -->
+<!-- QUIZ -->
 <div class="screen" id="sQuiz">
-  <div class="bar-scene" id="quizBarScene"></div>
+  <div class="room-scene-wrap" id="quizRoomSvg"></div>
   <div class="chars-layer" id="pubScene"></div>
   <div class="room-hud">
     <div class="logo-sm">🎬 Cine<span>Quiz</span></div>
@@ -357,10 +313,7 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   </div>
   <div class="bottom-sheet quiz-bottom">
     <div class="prog"><div class="prog-fill" id="progFill" style="width:0%"></div></div>
-    <div class="timer-row">
-      <div class="t-bar"><div class="t-fill" id="tFill"></div></div>
-      <div class="t-num" id="tNum">20</div>
-    </div>
+    <div class="timer-row"><div class="t-bar"><div class="t-fill" id="tFill"></div></div><div class="t-num" id="tNum">20</div></div>
     <div class="q-card">
       <div id="pickerTag"></div>
       <div class="q-cat" id="qCat"></div>
@@ -375,14 +328,14 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   </button>
 </div>
 
-<!-- ══ REVEAL ══ -->
+<!-- REVEAL -->
 <div class="screen" id="sReveal">
   <div class="screen-header">
     <div style="font-size:1.1rem;font-weight:800;color:var(--gold);font-family:'Playfair Display',serif">📊 Auflösung</div>
     <button class="btn-exit" onclick="goHome()">✕ Verlassen</button>
   </div>
   <div class="pub-scene" id="revealSceneWrap">
-    <svg class="scene-svg" id="revealBarSvg" viewBox="0 0 700 260" preserveAspectRatio="xMidYMid slice"></svg>
+    <svg class="scene-svg" id="revealRoomSvg" xmlns="http://www.w3.org/2000/svg"></svg>
     <div style="position:absolute;inset:0" id="revealScene"></div>
   </div>
   <div class="card" id="revealCard"></div>
@@ -390,13 +343,13 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   <div id="revealAction" style="width:100%"></div>
 </div>
 
-<!-- ══ FINAL ══ -->
+<!-- FINAL -->
 <div class="screen" id="sFinal">
   <div style="font-size:4rem" id="finalIcon">🏆</div>
   <div style="font-family:'Playfair Display',serif;font-size:2rem;font-weight:900;color:var(--gold)" id="finalTitle"></div>
-  <div style="color:#b07040;font-size:.9rem;margin-bottom:8px;font-weight:700" id="finalSub"></div>
+  <div style="color:#4a8080;font-size:.9rem;margin-bottom:8px;font-weight:700" id="finalSub"></div>
   <div class="pub-scene" id="finalSceneWrap">
-    <svg class="scene-svg" id="finalBarSvg" viewBox="0 0 700 260" preserveAspectRatio="xMidYMid slice"></svg>
+    <svg class="scene-svg" id="finalRoomSvg" xmlns="http://www.w3.org/2000/svg"></svg>
     <div style="position:absolute;inset:0" id="finalScene"></div>
   </div>
   <div class="card" style="width:100%"><h2>🏆 Endrangliste</h2><div id="finalScores"></div></div>
@@ -408,352 +361,451 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
 
 <script>
 // ── AVATARS ──────────────────────────────────────────────────────────────────
-const AVATARS=[{id:0,name:'Liam',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FDBCB4"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#2E4057"/><path d="M16 22 Q16 8 30 8 Q44 8 44 22" fill="#3D2B1F"/><circle cx="25" cy="21" r="2.5" fill="#3D2B1F"/><circle cx="35" cy="21" r="2.5" fill="#3D2B1F"/><path d="M25 29 Q30 33 35 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><ellipse cx="24" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".6"/><ellipse cx="36" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".6"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#2E4057"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FDBCB4"/></svg>`},{id:1,name:'Siobhan',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#F5C5A3"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#C0392B"/><path d="M16 18 Q18 4 30 6 Q42 4 44 18 Q40 10 30 12 Q20 10 16 18Z" fill="#8B0000"/><path d="M16 18 Q14 24 16 28 Q18 12 30 12 Q42 12 44 28 Q46 24 44 18" fill="#A00000"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 33 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><ellipse cx="24" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".7"/><ellipse cx="36" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".7"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#C0392B"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#F5C5A3"/></svg>`},{id:2,name:'Paddy',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FDBCB4"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#169B62"/><path d="M16 20 Q16 6 30 6 Q44 6 44 20" fill="#5C3A1E"/><rect x="14" y="15" width="32" height="6" rx="3" fill="#2C2C2C"/><rect x="22" y="10" width="16" height="6" rx="2" fill="#1A1A1A"/><circle cx="25" cy="21" r="2.5" fill="#3D2B1F"/><circle cx="35" cy="21" r="2.5" fill="#3D2B1F"/><path d="M24 28 Q30 34 36 28" stroke="#C47A5A" stroke-width="2" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#169B62"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FDBCB4"/></svg>`},{id:3,name:'Fiona',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#F0C070"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#8E44AD"/><path d="M16 16 Q16 4 30 4 Q44 4 44 16 Q44 8 38 8 Q34 6 30 6 Q26 6 22 8 Q16 8 16 16Z" fill="#D4A017"/><path d="M16 16 Q12 22 16 30 Q18 14 30 14 Q42 14 44 30 Q48 22 44 16" fill="#C4900D"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 33 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><ellipse cx="24" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".7"/><ellipse cx="36" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".7"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#8E44AD"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#F0C070"/></svg>`},{id:4,name:'Cormac',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#DEB887"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#34495E"/><path d="M16 20 Q18 6 30 8 Q42 6 44 20" fill="#704214"/><circle cx="25" cy="21" r="2.5" fill="#1A1A2E"/><circle cx="35" cy="21" r="2.5" fill="#1A1A2E"/><path d="M22 26 Q25 22 28 26" stroke="#8B5A2B" stroke-width="2" fill="#8B5A2B" opacity=".5"/><path d="M32 26 Q35 22 38 26" stroke="#8B5A2B" stroke-width="2" fill="#8B5A2B" opacity=".5"/><path d="M25 30 Q30 34 35 30" stroke="#A0522D" stroke-width="2" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#34495E"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#DEB887"/></svg>`},{id:5,name:'Brigid',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FDBCB4"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#E67E22"/><path d="M16 18 Q16 4 30 4 Q44 4 44 18 Q40 8 30 8 Q20 8 16 18Z" fill="#1A1A1A"/><path d="M16 18 Q12 28 16 34 Q14 22 30 16 Q46 22 44 34 Q48 28 44 18" fill="#111"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 33 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><ellipse cx="24" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".7"/><ellipse cx="36" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".7"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#E67E22"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FDBCB4"/></svg>`},{id:6,name:'Declan',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#F5CBA7"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#1ABC9C"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M24 29 Q30 34 36 29" stroke="#A0522D" stroke-width="2" fill="none"/><path d="M20 28 Q24 26 26 28 Q28 30 30 28 Q32 26 34 28 Q36 30 38 28" stroke="#C4A882" stroke-width="1.5" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#1ABC9C"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#F5CBA7"/></svg>`},{id:7,name:'Aoife',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FAEBD7"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#E91E8C"/><path d="M16 18 Q18 2 30 4 Q42 2 44 18 Q38 6 30 8 Q22 6 16 18Z" fill="#FF6B35"/><path d="M44 18 Q50 22 48 30 Q46 22 44 20" fill="#FF6B35"/><path d="M16 18 Q10 22 12 30 Q14 22 16 20" fill="#FF6B35"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 34 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><ellipse cx="24" cy="26" rx="3" ry="1.5" fill="#FFB6C1" opacity=".8"/><ellipse cx="36" cy="26" rx="3" ry="1.5" fill="#FFB6C1" opacity=".8"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#E91E8C"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FAEBD7"/></svg>`},{id:8,name:'Seamus',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#D2B48C"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#8B4513"/><path d="M16 20 Q16 6 30 6 Q44 6 44 20" fill="#8B4513"/><circle cx="25" cy="21" r="2.5" fill="#3D2B1F"/><circle cx="35" cy="21" r="2.5" fill="#3D2B1F"/><path d="M22 25 Q25 21 28 25 Q30 23 32 25 Q35 21 38 25" stroke="#8B5A2B" stroke-width="2.5" fill="rgba(139,90,43,.5)"/><path d="M26 30 Q30 35 34 30" stroke="#A0522D" stroke-width="2" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#8B4513"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#D2B48C"/><circle cx="30" cy="10" r="4" fill="#2C2C2C"/><rect x="22" y="8" width="16" height="4" rx="2" fill="#1A1A1A"/></svg>`},{id:9,name:'Niamh',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FDBCB4"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#3498DB"/><path d="M16 18 Q16 4 30 6 Q44 4 44 18 Q40 10 36 10 Q32 8 30 8 Q28 8 24 10 Q20 10 16 18Z" fill="#4A4A4A"/><path d="M16 18 Q14 24 16 28 Q16 16 30 14 Q44 16 44 28 Q46 24 44 18" fill="#333"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 33 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><ellipse cx="24" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".7"/><ellipse cx="36" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".7"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#3498DB"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FDBCB4"/></svg>`}];
+const AVATARS=[{id:0,name:'Liam',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FDBCB4"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#2E4057"/><path d="M16 22 Q16 8 30 8 Q44 8 44 22" fill="#3D2B1F"/><circle cx="25" cy="21" r="2.5" fill="#3D2B1F"/><circle cx="35" cy="21" r="2.5" fill="#3D2B1F"/><path d="M25 29 Q30 33 35 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><ellipse cx="24" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".6"/><ellipse cx="36" cy="26" rx="3" ry="1.5" fill="#F4A49E" opacity=".6"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#2E4057"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FDBCB4"/></svg>`},{id:1,name:'Siobhan',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#F5C5A3"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#C0392B"/><path d="M16 18 Q18 4 30 6 Q42 4 44 18 Q40 10 30 12 Q20 10 16 18Z" fill="#8B0000"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 33 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#C0392B"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#F5C5A3"/></svg>`},{id:2,name:'Paddy',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FDBCB4"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#169B62"/><path d="M16 20 Q16 6 30 6 Q44 6 44 20" fill="#5C3A1E"/><rect x="14" y="15" width="32" height="6" rx="3" fill="#2C2C2C"/><circle cx="25" cy="21" r="2.5" fill="#3D2B1F"/><circle cx="35" cy="21" r="2.5" fill="#3D2B1F"/><path d="M24 28 Q30 34 36 28" stroke="#C47A5A" stroke-width="2" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#169B62"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FDBCB4"/></svg>`},{id:3,name:'Fiona',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#F0C070"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#8E44AD"/><path d="M16 16 Q16 4 30 4 Q44 4 44 16 Q44 8 38 8 Q30 6 22 8 Q16 8 16 16Z" fill="#D4A017"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 33 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#8E44AD"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#F0C070"/></svg>`},{id:4,name:'Cormac',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#DEB887"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#34495E"/><path d="M16 20 Q18 6 30 8 Q42 6 44 20" fill="#704214"/><circle cx="25" cy="21" r="2.5" fill="#1A1A2E"/><circle cx="35" cy="21" r="2.5" fill="#1A1A2E"/><path d="M25 30 Q30 34 35 30" stroke="#A0522D" stroke-width="2" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#34495E"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#DEB887"/></svg>`},{id:5,name:'Brigid',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FDBCB4"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#E67E22"/><path d="M16 18 Q16 4 30 4 Q44 4 44 18 Q40 8 30 8 Q20 8 16 18Z" fill="#1A1A1A"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 33 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#E67E22"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FDBCB4"/></svg>`},{id:6,name:'Declan',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#F5CBA7"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#1ABC9C"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M24 29 Q30 34 36 29" stroke="#A0522D" stroke-width="2" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#1ABC9C"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#F5CBA7"/></svg>`},{id:7,name:'Aoife',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FAEBD7"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#E91E8C"/><path d="M16 18 Q18 2 30 4 Q42 2 44 18 Q38 6 30 8 Q22 6 16 18Z" fill="#FF6B35"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 34 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#E91E8C"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FAEBD7"/></svg>`},{id:8,name:'Seamus',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#D2B48C"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#8B4513"/><path d="M16 20 Q16 6 30 6 Q44 6 44 20" fill="#8B4513"/><circle cx="25" cy="21" r="2.5" fill="#3D2B1F"/><circle cx="35" cy="21" r="2.5" fill="#3D2B1F"/><path d="M26 30 Q30 35 34 30" stroke="#A0522D" stroke-width="2" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#8B4513"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#D2B48C"/><circle cx="30" cy="10" r="4" fill="#2C2C2C"/></svg>`},{id:9,name:'Niamh',svg:`<svg viewBox="0 0 60 60" xmlns="http://www.w3.org/2000/svg"><circle cx="30" cy="22" r="14" fill="#FDBCB4"/><ellipse cx="30" cy="50" rx="14" ry="10" fill="#3498DB"/><path d="M16 18 Q16 4 30 6 Q44 4 44 18 Q40 10 30 10 Q20 10 16 18Z" fill="#4A4A4A"/><circle cx="25" cy="21" r="2.5" fill="#2C3E50"/><circle cx="35" cy="21" r="2.5" fill="#2C3E50"/><path d="M26 29 Q30 33 34 29" stroke="#C47A5A" stroke-width="1.5" fill="none"/><rect x="22" y="36" width="16" height="14" rx="4" fill="#3498DB"/><path d="M28 30 Q30 32 32 30 L33 36 L27 36Z" fill="#FDBCB4"/></svg>`}];
 
-// ── CONFIG ───────────────────────────────────────────────────────────────────
 const PUSHER_KEY='83582c234bc0d30828ea', PUSHER_CLUSTER='eu';
 const CATS=[{id:'filme',icon:'🎬',label:'Filme'},{id:'serien',icon:'📺',label:'Serien'},{id:'geschichte',icon:'🏛️',label:'Geschichte'},{id:'wissen',icon:'🧠',label:'Allgemeinwissen'},{id:'musik',icon:'🎵',label:'Musik'},{id:'mix',icon:'🎲',label:'Mix'}];
-const DIFFS=[
-  {id:0,label:'Leicht',icon:'🟢',time:20,base:10,factor:1,desc:'±10'},
-  {id:1,label:'Mittel',icon:'🟡',time:15,base:20,factor:2,desc:'±40'},
-  {id:2,label:'Schwer',icon:'🔴',time:10,base:30,factor:3,desc:'±90'},
-];
+const DIFFS=[{id:0,label:'Leicht',icon:'🟢',time:20,base:10,factor:1,desc:'±10'},{id:1,label:'Mittel',icon:'🟡',time:15,base:20,factor:2,desc:'±40'},{id:2,label:'Schwer',icon:'🔴',time:10,base:30,factor:3,desc:'±90'}];
 const COUNTS=[4,6,8,10,12];
 const RANKS=['🥇','🥈','🥉','4.','5.','6.','7.','8.'];
 
-// ── STATE ────────────────────────────────────────────────────────────────────
-let G={
-  role:null,roomCode:null,playerId:genId(),playerName:null,
-  defaultCat:'mix',totalRounds:10,avatarId:0,
-  pickCat:'mix',pickDiff:0,
-  currentQ:0,totalQ:10,myScore:0,myCorrect:0,
-  currentQuestion:null,currentDiff:0,currentPickerId:null,
-  timeLeft:20,timerInt:null,answered:false,
-  pusher:null,channel:null,players:[],askedQs:[],
-};
+let G={role:null,roomCode:null,playerId:genId(),playerName:null,defaultCat:'mix',totalRounds:10,avatarId:0,pickCat:'mix',pickDiff:0,currentQ:0,totalQ:10,myScore:0,myCorrect:0,currentQuestion:null,currentDiff:0,currentPickerId:null,timeLeft:20,timerInt:null,answered:false,pusher:null,channel:null,players:[],askedQs:[]};
 
-// ── UTILS ────────────────────────────────────────────────────────────────────
 function genId(){return Math.random().toString(36).substr(2,10)}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
 function showErr(id,msg){const el=document.getElementById(id);el.innerHTML=`<div class="err-box">${msg}</div>`;setTimeout(()=>el.innerHTML='',4000)}
 async function api(body){const r=await fetch('/api/room',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});return r.json()}
 function getAv(id){return AVATARS.find(a=>a.id===id)||AVATARS[0]}
 
-// ── BAR SVG ILLUSTRATION ──────────────────────────────────────────────────────
-function buildBarSVG(w,h){
-  // Colour palette
-  const brick='#7a2e18',brickDark='#5a2010',brickMortar='#4a1a0a';
-  const wallTop='#3a1508',wallBot='#2a0e04';
-  const woodDark='#3a1a06',woodMid='#6b3510',woodLight='#9a5820';
-  const counterTop='#c8883a',counterFace='#8b5220';
-  const floorA='#5a3010',floorB='#3a1e06';
-  const lampYellow='rgba(255,210,80,.95)',lampOuter='rgba(255,140,20,.0)';
+// ══════════════════════════════════════════════════════════════════
+// CASINO ROOM SVG  — matches the reference image exactly
+// ══════════════════════════════════════════════════════════════════
+function buildCasinoRoom(W, H) {
+  // virtual coordinate space: always 800 wide, height proportional
+  const VW=800, VH=Math.round(800*(H/W));
 
-  let s=`<svg viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-  <defs>
-    <radialGradient id="lg1" cx="50%" cy="0%" r="70%"><stop offset="0%" stop-color="#c85a10" stop-opacity=".25"/><stop offset="100%" stop-color="#1a0600" stop-opacity="0"/></radialGradient>
-    <radialGradient id="lamp1" cx="50%" cy="0%" r="100%"><stop offset="0%" stop-color="${lampYellow}"/><stop offset="60%" stop-color="rgba(255,160,40,.3)"/><stop offset="100%" stop-color="${lampOuter}"/></radialGradient>
-    <radialGradient id="lamp2" cx="50%" cy="0%" r="100%"><stop offset="0%" stop-color="${lampYellow}"/><stop offset="60%" stop-color="rgba(255,160,40,.3)"/><stop offset="100%" stop-color="${lampOuter}"/></radialGradient>
-    <radialGradient id="lamp3" cx="50%" cy="0%" r="100%"><stop offset="0%" stop-color="${lampYellow}"/><stop offset="60%" stop-color="rgba(255,160,40,.3)"/><stop offset="100%" stop-color="${lampOuter}"/></radialGradient>
-    <radialGradient id="tableGrad" cx="40%" cy="30%" r="70%"><stop offset="0%" stop-color="#9a5820"/><stop offset="50%" stop-color="#6b3510"/><stop offset="100%" stop-color="#3a1a06"/></radialGradient>
-    <filter id="glow"><feGaussianBlur stdDeviation="6" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-    <filter id="softglow"><feGaussianBlur stdDeviation="12" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  </defs>
+  // ── palette ──
+  const C_CEIL   = '#0b2828';
+  const C_WALL_B = '#1a6868';   // back wall teal
+  const C_WALL_L = '#156060';   // left wall (slightly darker)
+  const C_WALL_R = '#5a2050';   // right wall purple/mauve
+  const C_WOOD   = '#7a4818';   // wood trim
+  const C_WOOD_L = '#c88030';   // wood trim highlight
+  const C_FLOOR  = '#1a3050';   // blue-grey floor
+  const C_FLOOR2 = '#142440';
+  const C_TBL_RIM= '#c88030';   // table wooden rim
+  const C_TBL_RIM2='#8b5420';
+  const C_FELT   = '#1e7048';   // felt green
+  const C_FELT_L = '#28905c';
+  const C_CHAIR_R= '#c83030';   // red chair
+  const C_CHAIR_T= '#20a8a0';   // teal chair (right side)
+  const C_LEGS   = '#1a1a28';
 
-  <!-- SKY / WALL BASE -->
-  <rect width="${w}" height="${h}" fill="${wallTop}"/>
-  <rect y="${h*.25}" width="${w}" height="${h*.75}" fill="${wallBot}"/>
+  // room perspective geometry
+  const vanX = VW/2, vanY = VH*0.30;  // vanishing point
+  const wallTop = VH*0.08;
+  const leftEdge = 0, rightEdge = VW;
+  const wallBottomL = VH*0.78, wallBottomR = VH*0.78;
+  const cornerL = VW*0.18, cornerR = VW*0.82;
 
-  <!-- BRICK WALL PATTERN -->
-  ${brickWall(w, h*.6, brick, brickDark, brickMortar)}
+  // table
+  const TBX=VW/2, TBY=VH*0.60, TRX=VW*0.35, TRY=VH*0.19;
 
-  <!-- ATMOSPHERIC GLOW from lamps -->
-  <ellipse cx="${w*.2}" cy="0" rx="${w*.22}" ry="${h*.55}" fill="url(#lamp1)" opacity=".6"/>
-  <ellipse cx="${w*.5}" cy="0" rx="${w*.2}" ry="${h*.5}" fill="url(#lamp2)" opacity=".5"/>
-  <ellipse cx="${w*.8}" cy="0" rx="${w*.22}" ry="${h*.55}" fill="url(#lamp3)" opacity=".6"/>
-  <rect width="${w}" height="${h}" fill="url(#lg1)"/>
+  let s = `<defs>
+  <radialGradient id="felts" cx="40%" cy="35%" r="72%">
+    <stop offset="0%" stop-color="${C_FELT_L}"/>
+    <stop offset="65%" stop-color="${C_FELT}"/>
+    <stop offset="100%" stop-color="#0d3a24"/>
+  </radialGradient>
+  <radialGradient id="tblEdge" cx="50%" cy="50%" r="65%">
+    <stop offset="0%" stop-color="${C_TBL_RIM}"/>
+    <stop offset="100%" stop-color="${C_TBL_RIM2}"/>
+  </radialGradient>
+  <radialGradient id="lampGlow" cx="50%" cy="0%" r="100%">
+    <stop offset="0%" stop-color="rgba(255,235,150,.55)"/>
+    <stop offset="45%" stop-color="rgba(255,200,80,.12)"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,0)"/>
+  </radialGradient>
+  <radialGradient id="chairRedG" cx="28%" cy="28%" r="72%">
+    <stop offset="0%" stop-color="#d84040"/>
+    <stop offset="100%" stop-color="#801818"/>
+  </radialGradient>
+  <radialGradient id="chairTealG" cx="28%" cy="28%" r="72%">
+    <stop offset="0%" stop-color="#28c0b0"/>
+    <stop offset="100%" stop-color="#107060"/>
+  </radialGradient>
+  <filter id="dshadow">
+    <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="rgba(0,0,0,.65)"/>
+  </filter>
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="9" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <filter id="softglow">
+    <feGaussianBlur stdDeviation="20" result="b"/>
+    <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <clipPath id="rc"><rect width="${VW}" height="${VH}"/></clipPath>
+</defs>
+<g clip-path="url(#rc)">`;
 
-  <!-- BACK WALL SHELF UNIT -->
-  ${backShelfUnit(w,h)}
-
-  <!-- HANGING PENDANT LAMPS -->
-  ${pendantLamp(w*.2, 0, h*.28, w, h)}
-  ${pendantLamp(w*.5, 0, h*.25, w, h)}
-  ${pendantLamp(w*.8, 0, h*.28, w, h)}
-
-  <!-- COUNTER / BAR -->
-  ${barCounter(w,h)}
-
-  <!-- FLOOR -->
-  ${woodFloor(w,h,floorA,floorB)}
-
-  <!-- BIG ROUND TABLE (central) -->
-  ${roundTable(w*.5, h*.72, w*.36, h*.16, w, h)}
-  `;
-
-  s += `</svg>`;
-  return s;
-}
-
-function brickWall(w,h,brick,dark,mortar){
-  let out='<g opacity=".85">';
-  const bh=18,bw=52,rows=Math.ceil(h/bh)+1;
-  for(let r=0;r<rows;r++){
-    const y=r*bh,offset=(r%2)===0?0:bw/2;
-    const cols=Math.ceil(w/bw)+2;
-    for(let c=-1;c<cols;c++){
-      const x=c*bw+offset-bw;
-      const shade=Math.random()>.5?brick:dark;
-      out+=`<rect x="${x}" y="${y}" width="${bw-2}" height="${bh-2}" rx="1" fill="${shade}"/>`;
-    }
-  }
-  out+=`</g>`;
-  // Mortar grid overlay
-  out+=`<rect width="${w}" height="${h}" fill="${mortar}" opacity=".08"/>`;
-  return out;
-}
-
-function backShelfUnit(w,h){
-  const sw=w*.7,sx=w*.15,sy=h*.04,sh=h*.52;
-  const wood='#5a2e10',woodLight='#7a4020',shelf='#8b5020',shelfEdge='#c07030';
-  let o='<g>';
-  // Cabinet back panel
-  o+=`<rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" fill="${wood}" rx="4" opacity=".9"/>`;
-  o+=`<rect x="${sx}" y="${sy}" width="${sw}" height="${sh}" fill="none" stroke="${woodLight}" stroke-width="3" rx="4"/>`;
-
-  // 3 shelves
-  const shelves=[sy+sh*.25,sy+sh*.52,sy+sh*.78];
-  shelves.forEach(sy2=>{
-    o+=`<rect x="${sx+6}" y="${sy2}" width="${sw-12}" height="10" fill="${shelf}" rx="2"/>`;
-    o+=`<rect x="${sx+6}" y="${sy2}" width="${sw-12}" height="4" fill="${shelfEdge}" rx="2" opacity=".7"/>`;
-    // Bottles on shelf
-    o+=drawBottles(sx+16, sy2-40, sw-32);
+  // ── CEILING ──
+  s+=`<polygon points="${leftEdge},0 ${rightEdge},0 ${cornerR},${wallTop} ${cornerL},${wallTop}" fill="${C_CEIL}"/>`;
+  // Ceiling recessed lights
+  [[0.28,0.05],[0.5,0.04],[0.72,0.05]].forEach(([cx,cy])=>{
+    const lx=VW*cx, ly=VH*cy;
+    s+=`<ellipse cx="${lx}" cy="${ly}" rx="20" ry="8" fill="#d0c8a0" opacity=".9"/>`;
+    s+=`<ellipse cx="${lx}" cy="${ly}" rx="13" ry="5" fill="#fff8d0"/>`;
+    s+=`<ellipse cx="${lx}" cy="${ly+VH*.10}" rx="${VW*0.12}" ry="${VH*.15}" fill="rgba(255,240,160,.07)"/>`;
   });
 
-  // NEON SIGN in center
-  const nsx=w*.5,nsy=sy+sh*.08;
-  o+=`<rect x="${nsx-80}" y="${nsy-18}" width="160" height="36" rx="18" fill="none" stroke="#ff4488" stroke-width="2.5" opacity=".85"/>`;
-  o+=`<text x="${nsx}" y="${nsy+6}" text-anchor="middle" font-family="'Playfair Display',serif" font-size="18" font-weight="900" fill="#ff88cc" opacity=".9" filter="url(#glow)">Quiz Pub</text>`;
+  // ── LEFT WALL (teal) ──
+  s+=`<polygon points="${leftEdge},0 ${cornerL},${wallTop} ${cornerL},${wallBottomL} ${leftEdge},${VH*0.88}" fill="${C_WALL_L}"/>`;
+  // subtle light gradient
+  s+=`<polygon points="${leftEdge},0 ${cornerL},${wallTop} ${cornerL},${wallBottomL} ${leftEdge},${VH*0.88}" fill="rgba(255,255,255,.04)"/>`;
 
-  o+='</g>';
-  return o;
-}
+  // ── BACK WALL (teal, centre) ──
+  s+=`<polygon points="${cornerL},${wallTop} ${cornerR},${wallTop} ${cornerR},${wallBottomR} ${cornerL},${wallBottomL}" fill="${C_WALL_B}"/>`;
+  // Subtle gradient on back wall
+  s+=`<polygon points="${cornerL},${wallTop} ${cornerR},${wallTop} ${cornerR},${wallBottomR} ${cornerL},${wallBottomL}" fill="url(#lampGlow)" opacity=".4"/>`;
 
-function drawBottles(x,y,width){
-  const colors=['#c0392b','#27ae60','#2980b9','#8e44ad','#e67e22','#1abc9c','#e74c3c','#f39c12','#16a085','#d35400'];
-  let o='<g>';
-  const n=Math.floor(width/22);
-  for(let i=0;i<n;i++){
-    const bx=x+i*22,col=colors[i%colors.length];
-    // bottle body
-    o+=`<rect x="${bx+3}" y="${y+8}" width="12" height="28" rx="3" fill="${col}" opacity=".85"/>`;
-    // bottle neck
-    o+=`<rect x="${bx+6}" y="${y}" width="6" height="12" rx="2" fill="${col}" opacity=".7"/>`;
-    // highlight
-    o+=`<rect x="${bx+5}" y="${y+10}" width="3" height="16" rx="1" fill="white" opacity=".2"/>`;
+  // ── RIGHT WALL (purple/mauve) ──
+  s+=`<polygon points="${cornerR},${wallTop} ${rightEdge},0 ${rightEdge},${VH*0.88} ${cornerR},${wallBottomR}" fill="${C_WALL_R}"/>`;
+  s+=`<polygon points="${cornerR},${wallTop} ${rightEdge},0 ${rightEdge},${VH*0.88} ${cornerR},${wallBottomR}" fill="rgba(0,0,0,.12)"/>`;
+
+  // ── WOOD TRIM — corner pillars ──
+  const trimW=18;
+  // Left corner pillar
+  s+=`<polygon points="${cornerL-trimW},${wallTop} ${cornerL+trimW},${wallTop} ${cornerL+trimW},${wallBottomL} ${cornerL-trimW},${wallBottomL}" fill="${C_WOOD}"/>`;
+  s+=`<polygon points="${cornerL-trimW/2},${wallTop} ${cornerL+4},${wallTop} ${cornerL+4},${wallBottomL} ${cornerL-trimW/2},${wallBottomL}" fill="${C_WOOD_L}" opacity=".45"/>`;
+  // Right corner pillar
+  s+=`<polygon points="${cornerR-trimW},${wallTop} ${cornerR+trimW},${wallTop} ${cornerR+trimW},${wallBottomR} ${cornerR-trimW},${wallBottomR}" fill="${C_WOOD}"/>`;
+  s+=`<polygon points="${cornerR-trimW/2},${wallTop} ${cornerR+4},${wallTop} ${cornerR+4},${wallBottomR} ${cornerR-trimW/2},${wallBottomR}" fill="${C_WOOD_L}" opacity=".35"/>`;
+
+  // Ceiling / baseboard trim
+  s+=`<line x1="${cornerL}" y1="${wallTop}" x2="${cornerR}" y2="${wallTop}" stroke="${C_WOOD_L}" stroke-width="10" opacity=".9"/>`;
+  s+=`<line x1="${cornerL}" y1="${wallBottomL}" x2="${cornerR}" y2="${wallBottomR}" stroke="${C_WOOD}" stroke-width="8" opacity=".8"/>`;
+  // Angled ceiling trims to corners
+  s+=`<line x1="0" y1="0" x2="${cornerL}" y2="${wallTop}" stroke="${C_WOOD}" stroke-width="8" opacity=".7"/>`;
+  s+=`<line x1="${VW}" y1="0" x2="${cornerR}" y2="${wallTop}" stroke="${C_WOOD}" stroke-width="8" opacity=".7"/>`;
+  // Floor baseboard
+  s+=`<polygon points="${leftEdge},${VH*0.88} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${VH*0.88}" fill="${C_WOOD}" opacity=".7"/>`;
+  s+=`<polygon points="${leftEdge},${VH*0.88} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${VH*0.88}" fill="${C_WOOD_L}" opacity=".2"/>`;
+
+  // ── FLOOR ──
+  s+=`<polygon points="${leftEdge},${VH*0.88} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${VH*0.88} ${rightEdge},${VH} ${leftEdge},${VH}" fill="${C_FLOOR}"/>`;
+  // Floor tile lines
+  const fY=VH*0.88, fH=VH-fY;
+  const nTiles=8;
+  for(let i=1;i<nTiles;i++){
+    const t=i/nTiles;
+    s+=`<line x1="${leftEdge+VW*t}" y1="${VH}" x2="${leftEdge+VW*t-(VW*.12)*t}" y2="${fY}" stroke="rgba(255,255,255,.04)" stroke-width="1"/>`;
   }
-  o+='</g>';
-  return o;
-}
+  for(let i=1;i<5;i++){
+    const t=i/5;
+    s+=`<line x1="${leftEdge}" y1="${fY+fH*t}" x2="${rightEdge}" y2="${fY+fH*t}" stroke="rgba(255,255,255,.04)" stroke-width="1"/>`;
+  }
 
-function pendantLamp(cx,cy,length,w,h){
-  const lx=cx;
-  return `<g filter="url(#softglow)">
-    <!-- cord -->
-    <line x1="${lx}" y1="${cy}" x2="${lx}" y2="${cy+length-20}" stroke="#2a1005" stroke-width="2"/>
-    <!-- shade outer -->
-    <ellipse cx="${lx}" cy="${cy+length}" rx="28" ry="12" fill="#c87820"/>
-    <ellipse cx="${lx}" cy="${cy+length-4}" rx="26" ry="10" fill="#e8a030"/>
-    <!-- shade inner glow -->
-    <ellipse cx="${lx}" cy="${cy+length+4}" rx="20" ry="8" fill="${'rgba(255,220,100,.9)'}"/>
-    <!-- bulb glow cone -->
-    <ellipse cx="${lx}" cy="${cy+length+30}" rx="55" ry="70" fill="rgba(255,200,60,.12)"/>
-    <ellipse cx="${lx}" cy="${cy+length+10}" rx="28" ry="20" fill="rgba(255,220,100,.3)"/>
-  </g>`;
-}
+  // ── WALL PICTURES ──
+  // Back wall: two flanking pictures + centre whiteboard
+  s += wallFrame(VW*0.29, VH*0.24, 110, 95, false);  // back left
+  s += wallFrame(VW*0.71, VH*0.24, 110, 95, false);  // back right
+  s += wallFrame(VW*0.50, VH*0.21, 150, 78, true);   // centre whiteboard/screen
+  // Side walls
+  s += wallFrame(VW*0.08, VH*0.30, 90, 80, false);   // left wall
+  s += wallFrame(VW*0.92, VH*0.28, 85, 78, false);   // right wall
 
-function barCounter(w,h){
-  const ch=h*.12,cy=h*.68;
-  const face=h*.14,fy=cy+ch;
-  return `<g>
-    <!-- Counter face -->
-    <rect x="0" y="${fy}" width="${w}" height="${face}" fill="#6b3510"/>
-    <rect x="0" y="${fy}" width="${w}" height="${face*.15}" fill="#9a5820"/>
-    <!-- Counter top surface -->
-    <rect x="${-w*.02}" y="${cy}" width="${w*1.04}" height="${ch}" fill="#c8883a"/>
-    <rect x="${-w*.02}" y="${cy}" width="${w*1.04}" height="${ch*.12}" fill="#e8aa50"/>
-    <!-- Counter edge highlight -->
-    <rect x="0" y="${cy+ch-4}" width="${w}" height="4" fill="#8b5020" opacity=".5"/>
-    <!-- Tap handles -->
-    ${tapHandles(w,cy)}
-    <!-- Bar stools row hint -->
-  </g>`;
-}
+  // ── PENDANT LAMP (central, hanging over table) ──
+  s += pendantLamp(VW/2, 0, VH*0.22, VW, VH);
 
-function tapHandles(w,counterY){
-  const taps=[w*.12,w*.17,w*.22];
-  let o='<g>';
-  taps.forEach(tx=>{
-    o+=`<rect x="${tx-4}" y="${counterY-70}" width="8" height="72" rx="3" fill="#888"/>`;
-    o+=`<rect x="${tx-4}" y="${counterY-70}" width="8" height="72" rx="3" fill="url(#lg1)" opacity=".3"/>`;
-    o+=`<ellipse cx="${tx}" cy="${counterY-72}" rx="7" ry="5" fill="#aaa"/>`;
-    o+=`<rect x="${tx-10}" y="${counterY-90}" width="20" height="18" rx="4" fill="#999"/>`;
+  // ── LAMP GLOW cone onto room ──
+  s+=`<ellipse cx="${VW/2}" cy="${VH*0.5}" rx="${VW*0.48}" ry="${VH*0.46}" fill="url(#lampGlow)" filter="url(#softglow)" opacity=".7"/>`;
+
+  // ── TABLE SHADOW ──
+  s+=`<ellipse cx="${TBX}" cy="${TBY+TRY*0.35}" rx="${TRX*0.88}" ry="${TRY*0.4}" fill="rgba(0,0,0,.5)"/>`;
+
+  // ── CHAIRS BEHIND TABLE (drawn before table surface) ──
+  const chairPositions = getChairPositions(8, TBX, TBY, TRX, TRY);
+  chairPositions.filter(p=>p.layer==='back').forEach((p,i)=>{
+    const col = p.x > VW/2 ? 'teal' : 'red';
+    s += svgChair(p.x, p.y, col, p.angle, p.scale, true);
   });
-  o+='</g>';
-  return o;
+
+  // ── TABLE ──
+  // Base / pedestal
+  s+=`<ellipse cx="${TBX}" cy="${TBY+TRY*0.78}" rx="${TRX*0.22}" ry="${TRY*0.14}" fill="#2a1004" opacity=".9"/>`;
+  s+=`<rect x="${TBX-TRX*0.1}" y="${TBY+TRY*0.45}" width="${TRX*0.2}" height="${TRY*0.55}" rx="10" fill="#3a1a08"/>`;
+  s+=`<ellipse cx="${TBX}" cy="${TBY+TRY*0.98}" rx="${TRX*0.22}" ry="${TRY*0.1}" fill="#2a1004"/>`;
+
+  // Table underside thickness
+  s+=`<ellipse cx="${TBX}" cy="${TBY+TRY*0.08}" rx="${TRX+20}" ry="${TRY*0.58}" fill="#2a1004"/>`;
+
+  // Wooden rim outer
+  s+=`<ellipse cx="${TBX}" cy="${TBY}" rx="${TRX+22}" ry="${TRY+11}" fill="${C_TBL_RIM2}" filter="url(#dshadow)"/>`;
+  s+=`<ellipse cx="${TBX}" cy="${TBY}" rx="${TRX+22}" ry="${TRY+11}" fill="url(#tblEdge)"/>`;
+  s+=`<ellipse cx="${TBX}" cy="${TBY}" rx="${TRX+10}" ry="${TRY+3}" fill="${C_TBL_RIM2}" opacity=".5"/>`;
+
+  // Felt surface
+  s+=`<ellipse cx="${TBX}" cy="${TBY}" rx="${TRX}" ry="${TRY}" fill="url(#felts)"/>`;
+  // Felt highlight
+  s+=`<ellipse cx="${TBX-TRX*0.18}" cy="${TBY-TRY*0.22}" rx="${TRX*0.52}" ry="${TRY*0.38}" fill="rgba(255,255,255,.055)"/>`;
+  // Inner rim detail
+  s+=`<ellipse cx="${TBX}" cy="${TBY}" rx="${TRX}" ry="${TRY}" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="2"/>`;
+
+  // ── TABLE ITEMS (cards, chips, device) ──
+  s += tableItems(TBX, TBY, TRX, TRY);
+
+  // ── CHAIRS FRONT (drawn after table) ──
+  chairPositions.filter(p=>p.layer==='front').forEach((p,i)=>{
+    const col = p.x > VW/2 ? 'teal' : 'red';
+    s += svgChair(p.x, p.y, col, p.angle, p.scale, false);
+  });
+
+  s+=`</g>`;
+  return {svgContent: s, VW, VH, TBX, TBY, TRX, TRY};
 }
 
-function woodFloor(w,h,a,b){
-  let o=`<g>`;
-  const fy=h*.82,fh=h*.18;
-  o+=`<rect x="0" y="${fy}" width="${w}" height="${fh}" fill="${a}"/>`;
-  // planks
-  const pw=w/8;
-  for(let i=0;i<9;i++){
-    const shade=i%2===0?a:b;
-    o+=`<rect x="${i*pw}" y="${fy}" width="${pw-1}" height="${fh}" fill="${shade}" opacity=".6"/>`;
+// ── Wall picture frame ──────────────────────────────────────────
+function wallFrame(cx, cy, w, h, isWhiteboard) {
+  const fx=cx-w/2, fy=cy-h/2;
+  let o='<g>';
+  // outer frame shadow
+  o+=`<rect x="${fx-3}" y="${fy+4}" width="${w+6}" height="${h+6}" rx="5" fill="rgba(0,0,0,.35)"/>`;
+  // frame
+  o+=`<rect x="${fx}" y="${fy}" width="${w}" height="${h}" rx="4" fill="#8b5e1a"/>`;
+  o+=`<rect x="${fx+3}" y="${fy+3}" width="${w-6}" height="${h-6}" rx="2" fill="#c88830" opacity=".6"/>`;
+  // inner content
+  if(isWhiteboard){
+    o+=`<rect x="${fx+10}" y="${fy+10}" width="${w-20}" height="${h-20}" rx="2" fill="#e8e0d0" opacity=".85"/>`;
+    o+=`<text x="${cx}" y="${fy+h/2+5}" text-anchor="middle" font-size="${Math.min(w,h)*.18}" fill="#8a7050" font-family="serif" opacity=".7">CineQuiz</text>`;
+  } else {
+    o+=`<rect x="${fx+10}" y="${fy+10}" width="${w-20}" height="${h-20}" rx="2" fill="#1a0a24" opacity=".8"/>`;
+    // Fleur-de-lis ornament
+    o+=`<text x="${cx}" y="${fy+h/2+6}" text-anchor="middle" font-size="${Math.min(w,h)*.42}" fill="rgba(200,160,60,.6)">⚜</text>`;
   }
-  // baseboard
-  o+=`<rect x="0" y="${fy}" width="${w}" height="6" fill="#2a1005"/>`;
   o+='</g>';
   return o;
 }
 
-function roundTable(cx,cy,rx,ry,w,h){
-  // Draw a perspective oval table
-  const sry=ry*.55; // top surface is flatter
+// ── Hanging pendant lamp ────────────────────────────────────────
+function pendantLamp(cx, topY, lampY, VW, VH) {
   return `<g>
-    <!-- Table shadow on floor -->
-    <ellipse cx="${cx}" cy="${cy+ry*.3}" rx="${rx*.85}" ry="${ry*.35}" fill="rgba(0,0,0,.5)" filter="url(#softglow)"/>
-    <!-- Table legs (4 visible) -->
-    <line x1="${cx-rx*.5}" y1="${cy+ry*.1}" x2="${cx-rx*.45}" y2="${cy+ry+h*.04}" stroke="#3a1a06" stroke-width="10" stroke-linecap="round"/>
-    <line x1="${cx+rx*.5}" y1="${cy+ry*.1}" x2="${cx+rx*.45}" y2="${cy+ry+h*.04}" stroke="#3a1a06" stroke-width="10" stroke-linecap="round"/>
-    <!-- Table underside edge -->
-    <ellipse cx="${cx}" cy="${cy+ry*.12}" rx="${rx}" ry="${ry*.55}" fill="#3a1a06"/>
-    <!-- Table top surface -->
-    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="url(#tableGrad)"/>
-    <!-- Table rim -->
-    <ellipse cx="${cx}" cy="${cy}" rx="${rx}" ry="${ry}" fill="none" stroke="#c8883a" stroke-width="5" opacity=".8"/>
-    <ellipse cx="${cx}" cy="${cy}" rx="${rx-6}" ry="${ry-3}" fill="none" stroke="#e8aa50" stroke-width="2" opacity=".4"/>
-    <!-- Drinks on table -->
-    ${tableItems(cx,cy,rx,ry)}
+    <ellipse cx="${cx}" cy="${topY+6}" rx="18" ry="6" fill="#0a0a0a"/>
+    <line x1="${cx}" y1="${topY+6}" x2="${cx}" y2="${lampY-26}" stroke="#111" stroke-width="4.5"/>
+    <!-- shade outer body -->
+    <ellipse cx="${cx}" cy="${lampY}" rx="72" ry="24" fill="#b07010"/>
+    <ellipse cx="${cx}" cy="${lampY-6}" rx="64" ry="20" fill="#d89030"/>
+    <!-- shade inner bright -->
+    <ellipse cx="${cx}" cy="${lampY+8}" rx="46" ry="15" fill="rgba(255,235,140,.95)" filter="url(#glow)"/>
+    <ellipse cx="${cx}" cy="${lampY-12}" rx="16" ry="6" fill="#b87820"/>
+    <!-- outer rim line -->
+    <ellipse cx="${cx}" cy="${lampY+2}" rx="72" ry="24" fill="none" stroke="#8a5010" stroke-width="3"/>
   </g>`;
 }
 
-function tableItems(cx,cy,rx,ry){
-  // Scatter drinks across the table top
-  const items=[
-    {x:cx-rx*.35,y:cy-ry*.1,type:'beer'},
-    {x:cx+rx*.3,y:cy-ry*.15,type:'cocktail'},
-    {x:cx-rx*.1,y:cy+ry*.05,type:'wine'},
-    {x:cx+rx*.12,y:cy+ry*.1,type:'beer'},
-    {x:cx-rx*.5,y:cy+ry*.05,type:'shot'},
-    {x:cx+rx*.5,y:cy+ry*.0,type:'shot'},
+// ── Table items: playing cards, chip stacks, devices ────────────
+function tableItems(cx, cy, rx, ry) {
+  let o='<g>';
+
+  // Chip stacks
+  const chips=[
+    {x:cx-rx*.42,y:cy-ry*.08,col:'#d4b820',n:4},
+    {x:cx+rx*.4,y:cy-ry*.18,col:'#d03030',n:3},
+    {x:cx-rx*.18,y:cy+ry*.1,col:'#3090d0',n:5},
+    {x:cx+rx*.52,y:cy+ry*.08,col:'#40c060',n:2},
+    {x:cx-rx*.58,y:cy-ry*.05,col:'#9040c0',n:3},
   ];
-  let o='<g>';
-  items.forEach(it=>{
-    if(it.type==='beer') o+=drinkBeer(it.x,it.y);
-    else if(it.type==='cocktail') o+=drinkCocktail(it.x,it.y);
-    else if(it.type==='wine') o+=drinkWine(it.x,it.y);
-    else o+=drinkShot(it.x,it.y);
+  chips.forEach(c=>{
+    for(let i=c.n;i>=0;i--){
+      o+=`<ellipse cx="${c.x}" cy="${c.y-i*4.5}" rx="15" ry="5.5" fill="${c.col}" opacity="${0.75+i*0.04}"/>`;
+      o+=`<ellipse cx="${c.x}" cy="${c.y-i*4.5}" rx="15" ry="5.5" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="1"/>`;
+    }
+    o+=`<ellipse cx="${c.x}" cy="${c.y-c.n*4.5}" rx="10" ry="3.5" fill="rgba(255,255,255,.14)"/>`;
   });
+
+  // Playing cards in centre
+  const cards=[
+    {x:cx-rx*.28,y:cy-ry*.06,r:-14,suit:'♥',val:'A',col:'#c01010'},
+    {x:cx-rx*.1,y:cy-ry*.13,r:-5,suit:'♠',val:'K',col:'#111'},
+    {x:cx+rx*.08,y:cy-ry*.11,r:5,suit:'♦',val:'Q',col:'#c01010'},
+    {x:cx+rx*.26,y:cy-ry*.05,r:14,suit:'♣',val:'J',col:'#111'},
+    {x:cx+rx*.44,y:cy-ry*.28,r:28,suit:'♠',val:'10',col:'#111'},
+  ];
+  cards.forEach(c=>{
+    o+=`<g transform="translate(${c.x},${c.y}) rotate(${c.r})">
+      <rect x="-16" y="-23" width="32" height="44" rx="4" fill="#f5f0e5" stroke="#ddd" stroke-width="1"/>
+      <rect x="-13" y="-19" width="26" height="36" rx="3" fill="none" stroke="rgba(180,140,40,.4)" stroke-width="1.5"/>
+      <text x="0" y="-7" text-anchor="middle" font-size="12" fill="${c.col}" font-weight="bold">${c.suit}</text>
+      <text x="0" y="10" text-anchor="middle" font-size="10" fill="${c.col}">${c.val}</text>
+    </g>`;
+  });
+
+  // Face-down cards (dark)
+  [
+    {x:cx-rx*.5,y:cy+ry*.12,r:-20},
+    {x:cx+rx*.12,y:cy+ry*.16,r:8},
+  ].forEach(c=>{
+    o+=`<g transform="translate(${c.x},${c.y}) rotate(${c.r})">
+      <rect x="-16" y="-23" width="32" height="44" rx="4" fill="#1a3a6a" stroke="#2a5090" stroke-width="1.5"/>
+      <rect x="-12" y="-19" width="24" height="36" rx="2" fill="none" stroke="rgba(100,160,255,.2)" stroke-width="1"/>
+    </g>`;
+  });
+
+  // Tablet/device on table
+  o+=`<g transform="translate(${cx-rx*.62},${cy+ry*.18}) rotate(-12)">
+    <rect x="-22" y="-16" width="44" height="28" rx="5" fill="#1a1a2a" stroke="#444" stroke-width="2"/>
+    <rect x="-18" y="-12" width="36" height="20" rx="3" fill="#253545"/>
+    <rect x="-8" y="-5" width="16" height="8" rx="2" fill="#3a8a8a" opacity=".7"/>
+  </g>`;
+  o+=`<g transform="translate(${cx+rx*.55},${cy-ry*.05}) rotate(10)">
+    <rect x="-20" y="-14" width="40" height="26" rx="5" fill="#1a1a2a" stroke="#444" stroke-width="2"/>
+    <rect x="-16" y="-10" width="32" height="18" rx="3" fill="#2a2535"/>
+  </g>`;
+
   o+='</g>';
   return o;
 }
 
-function drinkBeer(x,y){
-  return `<g transform="translate(${x},${y}) scale(.55)">
-    <rect x="-8" y="-22" width="16" height="26" rx="3" fill="#d4a010" opacity=".9"/>
-    <rect x="-8" y="-22" width="16" height="8" rx="3" fill="rgba(255,255,255,.6)"/>
-    <rect x="-10" y="-16" width="5" height="10" rx="2" fill="#b08010" opacity=".7"/>
-    <rect x="-8" y="-22" width="16" height="26" rx="3" fill="none" stroke="#c08010" stroke-width="1.5"/>
-  </g>`;
-}
-function drinkCocktail(x,y){
-  return `<g transform="translate(${x},${y}) scale(.55)">
-    <polygon points="-12,-24 12,-24 3,0 -3,0" fill="#e040fb" opacity=".85"/>
-    <rect x="-1" y="0" width="2" height="10" fill="#aaa"/>
-    <line x1="-2" y1="-20" x2="8" y2="-24" stroke="rgba(255,255,255,.6)" stroke-width="1.5"/>
-    <ellipse cx="0" cy="-24" rx="12" ry="2.5" fill="#d030e0" opacity=".5"/>
-  </g>`;
-}
-function drinkWine(x,y){
-  return `<g transform="translate(${x},${y}) scale(.55)">
-    <ellipse cx="0" cy="-18" rx="8" ry="10" fill="#9b1212" opacity=".85"/>
-    <rect x="-1.5" y="-8" width="3" height="12" fill="#888"/>
-    <ellipse cx="0" cy="4" rx="6" ry="2" fill="#777"/>
-    <ellipse cx="0" cy="-20" rx="7" ry="2" fill="rgba(255,255,255,.2)"/>
-  </g>`;
-}
-function drinkShot(x,y){
-  return `<g transform="translate(${x},${y}) scale(.5)">
-    <rect x="-5" y="-14" width="10" height="16" rx="2" fill="#e8c050" opacity=".9"/>
-    <rect x="-5" y="-14" width="10" height="5" rx="2" fill="rgba(255,255,255,.4)"/>
-  </g>`;
+// ── SVG chair (drawn into room SVG) ─────────────────────────────
+function svgChair(cx, cy, color, angleDeg, scale, backOnly) {
+  const col = color==='red' ? 'url(#chairRedG)' : 'url(#chairTealG)';
+  const colStr = color==='red' ? '#c03030' : '#20a8a0';
+  const colDk  = color==='red' ? '#801818' : '#107060';
+  const legCol = '#1a1a28';
+  const sc = scale || 1;
+  // Chair is drawn centered at (cx, cy) = seat-center
+  let o=`<g transform="translate(${cx},${cy}) rotate(${angleDeg}) scale(${sc})">`;
+  if(backOnly){
+    // Only show backrest (chair is behind table)
+    o+=`<rect x="-24" y="-60" width="48" height="54" rx="13" fill="${col}"/>`;
+    o+=`<rect x="-18" y="-54" width="36" height="42" rx="8" fill="${colDk}" opacity=".28"/>`;
+    o+=`<ellipse cx="0" cy="-60" rx="24" ry="10" fill="${col}"/>`;
+    o+=`<ellipse cx="0" cy="-58" rx="18" ry="7" fill="${colDk}" opacity=".22"/>`;
+  } else {
+    // Full chair (front side, near viewer)
+    // Star base legs
+    const angles=[0,72,144,216,288];
+    angles.forEach(a=>{
+      const rad=a*Math.PI/180;
+      const lx=Math.cos(rad)*32, ly=Math.sin(rad)*32;
+      o+=`<line x1="0" y1="0" x2="${lx}" y2="${ly}" stroke="${legCol}" stroke-width="7" stroke-linecap="round"/>`;
+      o+=`<ellipse cx="${lx}" cy="${ly}" rx="7" ry="3.5" fill="${legCol}"/>`;
+    });
+    // Center post
+    o+=`<rect x="-5" y="-42" width="10" height="46" rx="5" fill="${colDk}" opacity=".7"/>`;
+    // Seat
+    o+=`<ellipse cx="0" cy="-38" rx="28" ry="13" fill="${col}"/>`;
+    o+=`<ellipse cx="-6" cy="-40" rx="14" ry="7" fill="${colDk}" opacity=".22"/>`;
+    // Backrest
+    o+=`<rect x="-24" y="-96" width="48" height="60" rx="13" fill="${col}"/>`;
+    o+=`<rect x="-18" y="-90" width="36" height="48" rx="9" fill="${colDk}" opacity=".28"/>`;
+    o+=`<ellipse cx="0" cy="-96" rx="24" ry="10" fill="${col}"/>`;
+  }
+  o+=`</g>`;
+  return o;
 }
 
-// ── RENDER BAR SCENE ──────────────────────────────────────────────────────────
-function renderBarScene(containerId){
+// ── Compute chair positions around table ────────────────────────
+function getChairPositions(maxN, TBX, TBY, TRX, TRY) {
+  const positions=[];
+  for(let i=0;i<maxN;i++){
+    const angle=(i/maxN)*2*Math.PI - Math.PI/2;
+    const spreadX=TRX*1.30;
+    const spreadY=TRY*1.38;
+    const px=TBX+spreadX*Math.cos(angle);
+    const py=TBY+spreadY*Math.sin(angle)*0.75;
+    const layer=Math.sin(angle)<0?'back':'front';
+    // Angle the chair to face the table center
+    const facingAngle=Math.atan2(TBY-py, TBX-px)*(180/Math.PI)+90;
+    // Scale: chairs further away appear slightly smaller
+    const distFactor=1-Math.abs(Math.sin(angle))*0.10;
+    positions.push({x:px, y:py, angle:facingAngle, layer, scale:distFactor, rawAngle:angle});
+  }
+  return positions;
+}
+
+// ── Render the casino room into a container ──────────────────────
+let _roomCache = null;
+function getRoomData(W, H){
+  // Cache based on W/H ratio to avoid redundant rebuilds
+  if(_roomCache && _roomCache.W===W && _roomCache.H===H) return _roomCache;
+  const data = buildCasinoRoom(W, H);
+  _roomCache = {...data, W, H};
+  return _roomCache;
+}
+
+function renderRoomScene(containerId) {
   const el=document.getElementById(containerId);
-  if(!el)return;
-  const w=window.innerWidth,h=window.innerHeight;
-  el.innerHTML=buildBarSVG(w,h);
+  if(!el) return;
+  const W=window.innerWidth, H=window.innerHeight;
+  const {svgContent, VW, VH} = getRoomData(W, H);
+  el.innerHTML=`<svg viewBox="0 0 ${VW} ${VH}" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" width="100%" height="100%">${svgContent}</svg>`;
 }
 
-function renderBarSceneSmall(svgId,w,h){
-  const el=document.getElementById(svgId);
-  if(!el)return;
-  el.setAttribute('viewBox',`0 0 ${w} ${h}`);
-  el.innerHTML=buildBarSVG(w,h).replace(/<svg[^>]*>/,'').replace('</svg>','');
+function renderRoomSceneSmall(svgEl, containerW, containerH) {
+  if(!svgEl) return;
+  const W=containerW, H=containerH;
+  const {svgContent, VW, VH} = buildCasinoRoom(W, H);
+  svgEl.setAttribute('viewBox',`0 0 ${VW} ${VH}`);
+  svgEl.setAttribute('preserveAspectRatio','xMidYMid slice');
+  svgEl.innerHTML=svgContent;
 }
 
-// ── RENDER CHARACTERS ────────────────────────────────────────────────────────
-function renderScene(sceneId,players,opts={}){
+// ── Place avatar characters on their chairs ──────────────────────
+function renderScene(sceneId, players, opts={}) {
   const scene=document.getElementById(sceneId);
-  if(!scene)return;
+  if(!scene) return;
   scene.querySelectorAll('.seat').forEach(s=>s.remove());
-  if(!players?.length)return;
+  if(!players?.length) return;
 
-  // For full-screen room scenes, use viewport; for small scenes use element size
-  const isRoom=sceneId==='pickScene'||sceneId==='pubScene';
-  const W=isRoom?window.innerWidth:scene.offsetWidth||700;
-  const H=isRoom?window.innerHeight:scene.offsetHeight||260;
+  const isFullscreen = sceneId==='pickScene'||sceneId==='pubScene';
+  const W = isFullscreen ? window.innerWidth  : (scene.offsetWidth  || 700);
+  const H = isFullscreen ? window.innerHeight : (scene.offsetHeight || 260);
 
-  // Table center — must match buildBarSVG roundTable params
-  const tcx=W*.5, tcy=isRoom?H*.72:H*.65;
-  const trx=W*.36, try2=H*(isRoom?.16:.12);
+  // Get the virtual coords used for the SVG
+  const VW = 800, VH = Math.round(800*(H/W));
+  // Scale factors from virtual → actual pixels
+  const scaleX = W/VW, scaleY = H/VH;
 
-  const n=players.length;
-  players.forEach((p,i)=>{
-    const angle=(i/n)*2*Math.PI - Math.PI/2;
-    // Spread around the table ellipse, slightly outside
-    const spread=1.22;
-    const px=tcx+trx*spread*Math.cos(angle);
-    const py=tcy+try2*spread*Math.sin(angle)*0.7;
+  const TBX=VW/2, TBY=VH*0.60, TRX=VW*0.35, TRY=VH*0.19;
+  const chairPos = getChairPositions(players.length, TBX, TBY, TRX, TRY);
 
-    const av=getAv(p.avatarId||0);
-    const isPicker=p.id===opts.pickerId;
-    const isJubel=p.id===opts.jubelId;
-    const isAnswered=(opts.answeredIds||[]).includes(p.id);
+  // Avatar size: full-screen large, small scene compact
+  const avSize = isFullscreen ? 72 : 52;
+
+  players.forEach((p, i) => {
+    const pos = chairPos[i];
+    if(!pos) return;
+
+    // Convert virtual chair position to real pixels
+    // Seat the avatar AT the chair position — slightly above seat center
+    const realX = pos.x * scaleX;
+    const realY = (pos.y - (isFullscreen ? 30 : 20)) * scaleY;
+
+    const av = getAv(p.avatarId||0);
+    const isPicker = p.id===opts.pickerId;
+    const isJubel  = p.id===opts.jubelId;
+    const isAnswered = (opts.answeredIds||[]).includes(p.id);
 
     const seat=document.createElement('div');
     seat.className='seat'+(isPicker?' is-picker':'')+(isJubel?' jubel':'');
-    // Center the 68×68 avatar on the computed point
-    const svgSize=isRoom?68:56;
-    seat.style.left=(px - svgSize/2)+'px';
-    seat.style.top=(py - svgSize*1.1)+'px';
-    seat.innerHTML=av.svg+`<div class="sname">${p.name}</div><div class="sbadge">${isPicker?'🎯':isAnswered?'✅':''}</div>`;
+    seat.style.left = realX+'px';
+    seat.style.top  = realY+'px';
+    // transform:translate(-50%,-100%) is in CSS — anchor bottom-center of avatar at seat
+
+    // We size the inner SVG via an attribute approach
+    const avSvg = av.svg.replace('<svg ', `<svg width="${avSize}" height="${avSize}" `);
+
+    seat.innerHTML=`<div class="av-wrap">${avSvg}<div class="sbadge">${isPicker?'🎯':isAnswered?'✅':''}</div></div><div class="sname">${p.name}</div>`;
     scene.appendChild(seat);
   });
 }
 
-// ── AVATAR GRID ───────────────────────────────────────────────────────────────
+// ── LOBBY CONTROLS ────────────────────────────────────────────────
 function buildAvatarGrid(gridId,key){
   const g=document.getElementById(gridId);if(!g)return;g.innerHTML='';
   AVATARS.forEach(av=>{const b=document.createElement('div');b.className='avatar-opt'+(G[key]===av.id?' sel':'');b.innerHTML=av.svg+`<div class="aname">${av.name}</div>`;b.onclick=()=>{G[key]=av.id;buildAvatarGrid(gridId,key)};g.appendChild(b)});
 }
-
-// ── LOBBY CONTROLS ────────────────────────────────────────────────────────────
 function buildCats(){const g=document.getElementById('catGrid');g.innerHTML='';CATS.forEach(c=>{const b=document.createElement('button');b.className='cat-btn'+(c.id===G.defaultCat?' sel':'');b.innerHTML=`<span class="cat-icon">${c.icon}</span>${c.label}`;b.onclick=()=>{G.defaultCat=c.id;buildCats()};g.appendChild(b)})}
 function buildCounts(){const r=document.getElementById('countRow');r.innerHTML='';COUNTS.forEach(n=>{const b=document.createElement('button');b.className='opt-btn'+(n===G.totalRounds?' sel':'');b.textContent=n+' Runden';b.onclick=()=>{G.totalRounds=n;buildCounts()};r.appendChild(b)})}
 function renderPlayers(players,isHost){
@@ -762,8 +814,6 @@ function renderPlayers(players,isHost){
   document.getElementById(cId).textContent=players.length;
   document.getElementById(gId).innerHTML=players.map(p=>`<div class="p-chip ${p.isHost?'host':''}">${getAv(p.avatarId||0).svg}<span>${p.name}</span>${p.isHost?'<span class="badge">Host</span>':''}</div>`).join('');
 }
-
-// ── PICK CONTROLS ─────────────────────────────────────────────────────────────
 function buildPickCats(){
   const g=document.getElementById('pickCatGrid');g.innerHTML='';
   CATS.forEach(c=>{const b=document.createElement('button');b.className='cat-chip'+(c.id===G.pickCat?' sel':'');b.innerHTML=`${c.icon} ${c.label}`;b.onclick=()=>{G.pickCat=c.id;buildPickCats()};g.appendChild(b)});
@@ -771,11 +821,11 @@ function buildPickCats(){
 function buildPickDiffs(){
   const g=document.getElementById('pickDiffGrid');g.innerHTML='';
   DIFFS.forEach(d=>{const b=document.createElement('div');b.className=`diff-chip d${d.id}`+(G.pickDiff===d.id?' sel':'');
-    b.innerHTML=`${d.icon} ${d.label}<div style="font-size:.62rem;opacity:.65;margin-top:1px">${d.desc} Pkt</div>`;
+    b.innerHTML=`${d.icon} ${d.label}<div style="font-size:.62rem;opacity:.6;margin-top:1px">${d.desc} Pkt</div>`;
     b.onclick=()=>{G.pickDiff=d.id;buildPickDiffs()};g.appendChild(b)});
 }
 
-// ── PUSHER ────────────────────────────────────────────────────────────────────
+// ── PUSHER ────────────────────────────────────────────────────────
 function subscribePusher(code){
   if(G.pusher)G.pusher.disconnect();
   G.pusher=new Pusher(PUSHER_KEY,{cluster:PUSHER_CLUSTER});
@@ -793,7 +843,7 @@ function subscribePusher(code){
   G.channel.bind('game-final',d=>showFinal(d.scores));
 }
 
-// ── CREATE / JOIN ─────────────────────────────────────────────────────────────
+// ── CREATE / JOIN ──────────────────────────────────────────────────
 async function createRoom(){
   const name=document.getElementById('hostName').value.trim();
   if(!name){showErr('homeErr','Bitte Namen eingeben!');return}
@@ -817,17 +867,16 @@ async function joinRoom(){
   document.getElementById('guestCode').textContent=code;
   subscribePusher(code);renderPlayers(res.room.players,false);show('sLobbyGuest');
 }
-
-// ── START GAME ────────────────────────────────────────────────────────────────
 async function startGame(){
   const res=await api({action:'start',roomCode:G.roomCode,playerId:G.playerId,data:{totalRounds:G.totalRounds,cat:G.defaultCat}});
   if(res.error){showErr('lobbyErr',res.error);return}
   G.myScore=0;G.myCorrect=0;G.currentQ=0;G.totalQ=G.totalRounds;G.askedQs=[];
 }
 
-// ── PICK SCREEN ───────────────────────────────────────────────────────────────
+// ── PICK SCREEN ────────────────────────────────────────────────────
 function showPickScreen(d){
-  renderBarScene('pickBarScene');
+  _roomCache=null; // force fresh render for new screen size
+  renderRoomScene('pickRoomSvg');
   const isMe=d.pickerId===G.playerId;
   document.getElementById('pickTitle').textContent=isMe?'🎯 Du bist dran!':'⏳ '+d.pickerName+' wählt...';
   document.getElementById('pickSub').textContent=`Runde ${d.roundNum} von ${d.totalRounds}`;
@@ -840,7 +889,6 @@ function showPickScreen(d){
   show('sPick');
   requestAnimationFrame(()=>renderScene('pickScene',G.players,{pickerId:d.pickerId}));
 }
-
 async function confirmPick(){
   const btn=document.getElementById('pickConfirmBtn');
   btn.disabled=true;btn.textContent='⏳ Generiere...';
@@ -849,14 +897,14 @@ async function confirmPick(){
       body:JSON.stringify({category:G.pickCat,difficulty:G.pickDiff,exclude:G.askedQs})});
     const d=await r.json();
     if(d.error||!d.question){btn.disabled=false;btn.textContent='🎲 Frage generieren!';alert('Fehler: '+d.error);return}
-    await api({action:'picked',roomCode:G.roomCode,playerId:G.playerId,data:{
-      cat:G.pickCat,diff:G.pickDiff,question:d.question,pickerId:G.playerId,pickerName:G.playerName}});
+    await api({action:'picked',roomCode:G.roomCode,playerId:G.playerId,data:{cat:G.pickCat,diff:G.pickDiff,question:d.question,pickerId:G.playerId,pickerName:G.playerName}});
   }catch(e){btn.disabled=false;btn.textContent='🎲 Frage generieren!';alert('Fehler: '+e.message)}
 }
 
-// ── LOAD QUESTION ─────────────────────────────────────────────────────────────
+// ── QUIZ ───────────────────────────────────────────────────────────
 function loadQuestion(d){
-  renderBarScene('quizBarScene');
+  _roomCache=null;
+  renderRoomScene('quizRoomSvg');
   G.answered=false;
   const q=d.question,diff=DIFFS[d.diff];
   G.currentQ++;
@@ -876,8 +924,6 @@ function loadQuestion(d){
   requestAnimationFrame(()=>renderScene('pubScene',G.players,{pickerId:d.pickerId}));
   startTimer(diff.time);
 }
-
-// ── TIMER ─────────────────────────────────────────────────────────────────────
 function startTimer(secs){
   clearInterval(G.timerInt);G.timeLeft=secs;updateTimer(1);
   G.timerInt=setInterval(()=>{
@@ -893,8 +939,6 @@ function updateTimer(p){
   document.getElementById('tFill').style.background=p>.5?'#2ecc71':p>.25?'#f39c12':'#e74c3c';
   document.getElementById('tNum').textContent=Math.ceil(G.timeLeft);
 }
-
-// ── ANSWER ────────────────────────────────────────────────────────────────────
 async function selectAnswer(idx){
   if(G.answered)return;G.answered=true;clearInterval(G.timerInt);
   const q=G.currentQuestion,diff=DIFFS[G.currentDiff];
@@ -915,10 +959,11 @@ async function autoAnswer(){
   await api({action:'answer',roomCode:G.roomCode,playerId:G.playerId,playerName:G.playerName,data:{qIdx:G.currentQ,chosen:-1,correct:G.currentQuestion.c,pts:0}});
 }
 
-// ── REVEAL ────────────────────────────────────────────────────────────────────
+// ── REVEAL ─────────────────────────────────────────────────────────
 function showReveal(d){
   clearInterval(G.timerInt);
-  renderBarSceneSmall('revealBarSvg',700,260);
+  const svgEl=document.getElementById('revealRoomSvg');
+  if(svgEl){renderRoomSceneSmall(svgEl,700,260);}
   const q=d.question,diff=DIFFS[d.diff];
   const ansHtml=q.a.map((a,i)=>`<div class="rev-ans ${i===q.c?'correct':'wrong'}">${i===q.c?'✅':'❌'} ${a}</div>`).join('');
   const chips=Object.values(d.answers||{}).map(a=>{
@@ -928,11 +973,11 @@ function showReveal(d){
   }).join('');
   const picker=G.players.find(p=>p.id===d.pickerId);
   document.getElementById('revealCard').innerHTML=`
-    <div style="font-size:.72rem;color:#b07040;margin-bottom:8px;font-weight:700">${diff.icon} ${diff.label} · Gewählt von ${picker?.name||'?'}</div>
+    <div style="font-size:.72rem;color:#4a8080;margin-bottom:8px;font-weight:700">${diff.icon} ${diff.label} · Gewählt von ${picker?.name||'?'}</div>
     <div style="font-weight:700;color:var(--gold);margin-bottom:12px">❓ ${q.q}</div>
     <div class="rev-ans-grid">${ansHtml}</div>
-    <div style="font-size:.7rem;color:#7a5030;margin-bottom:7px;text-transform:uppercase;letter-spacing:1px;font-weight:800">Spieler-Antworten</div>
-    <div class="chips">${chips||'<span style="color:#555">Keine Antworten</span>'}</div>`;
+    <div style="font-size:.7rem;color:#3a7070;margin-bottom:7px;text-transform:uppercase;letter-spacing:1px;font-weight:800">Spieler-Antworten</div>
+    <div class="chips">${chips||'<span style="color:#333">Keine Antworten</span>'}</div>`;
   const sc=d.scores||[];
   document.getElementById('interimScores').innerHTML=sc.map((p,i)=>{
     const av=getAv(G.players.find(pl=>pl.id===p.id)?.avatarId||0);
@@ -945,16 +990,16 @@ function showReveal(d){
     :`<div class="info-box"><span class="sdot"></span>Warte auf Spielleiter...</div>`;
   show('sReveal');
 }
-
 async function nextRound(){await api({action:'next',roomCode:G.roomCode,playerId:G.playerId})}
 
-// ── FINAL ─────────────────────────────────────────────────────────────────────
+// ── FINAL ───────────────────────────────────────────────────────────
 function showFinal(scores){
-  renderBarSceneSmall('finalBarSvg',700,260);
+  const svgEl=document.getElementById('finalRoomSvg');
+  if(svgEl){renderRoomSceneSmall(svgEl,700,260);}
   const w=scores[0],isMe=w&&w.id===G.playerId;
   document.getElementById('finalIcon').textContent=isMe?'🏆':'🎬';
   document.getElementById('finalTitle').textContent=w?`${w.name} gewinnt!`:'Game Over!';
-  document.getElementById('finalSub').textContent=`${G.totalQ} Runden · Quiz Pub 🍺`;
+  document.getElementById('finalSub').textContent=`${G.totalQ} Runden · Quiz Pub 🃏`;
   document.getElementById('finalScores').innerHTML=scores.map((p,i)=>{
     const av=getAv(G.players.find(pl=>pl.id===p.id)?.avatarId||0);
     return `<div class="s-row ${i===0?'r1':i===1?'r2':i===2?'r3':''}">${av.svg}<div class="rank">${RANKS[i]||i+1+'.'}</div><div class="sname">${p.name}${p.id===G.playerId?' <span style="color:var(--blue)">(Du)</span>':''}</div><div><div class="spts">${p.total}</div><div class="scor">${p.correct}/${G.totalQ}✓</div></div></div>`;
@@ -963,10 +1008,9 @@ function showFinal(scores){
   show('sFinal');
   if(isMe)setTimeout(confetti,400);
 }
-
 function playAgain(){if(G.role==='host'){buildCats();buildCounts();show('sLobbyHost');}else goHome()}
 function goHome(){if(G.pusher)G.pusher.disconnect();clearInterval(G.timerInt);show('sHome')}
-function confetti(){const cols=['#f5c518','#ff883e','#2ecc71','#169b62','#e94560','#fff'];for(let i=0;i<80;i++){const c=document.createElement('div');c.className='confetti-piece';c.style.left=Math.random()*100+'vw';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.animationDuration=(Math.random()*2+2)+'s';c.style.animationDelay=Math.random()+'s';c.style.width=c.style.height=(Math.random()*8+6)+'px';c.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(c);setTimeout(()=>c.remove(),4000)}}
+function confetti(){const cols=['#f5c518','#ff883e','#2ecc71','#1a9898','#e94560','#fff'];for(let i=0;i<80;i++){const c=document.createElement('div');c.className='confetti-piece';c.style.left=Math.random()*100+'vw';c.style.background=cols[Math.floor(Math.random()*cols.length)];c.style.animationDuration=(Math.random()*2+2)+'s';c.style.animationDelay=Math.random()+'s';c.style.width=c.style.height=(Math.random()*8+6)+'px';c.style.borderRadius=Math.random()>.5?'50%':'2px';document.body.appendChild(c);setTimeout(()=>c.remove(),4000)}}
 
 // Init
 buildAvatarGrid('joinAvatarGrid','avatarId');
