@@ -93,7 +93,7 @@ body{background:var(--dark);color:var(--text);font-family:'Nunito',sans-serif;mi
   display:flex;flex-direction:column;align-items:center;
   gap:0px;
   pointer-events:none;
-  transform:translate(-50%,-100%); /* anchor bottom-center of avatar on chair seat */
+  /* transform set inline per seat for centering */
 }
 .seat .av-wrap{position:relative;display:flex;align-items:center;justify-content:center}
 .seat .av-wrap svg{display:block;filter:drop-shadow(0 4px 10px rgba(0,0,0,.85))}
@@ -524,13 +524,6 @@ function buildCasinoRoom(W, H) {
   // ── TABLE SHADOW ──
   s+=`<ellipse cx="${TBX}" cy="${TBY+TRY*0.35}" rx="${TRX*0.88}" ry="${TRY*0.4}" fill="rgba(0,0,0,.5)"/>`;
 
-  // ── CHAIRS BEHIND TABLE (drawn before table surface) ──
-  const chairPositions = getChairPositions(8, TBX, TBY, TRX, TRY);
-  chairPositions.filter(p=>p.layer==='back').forEach((p,i)=>{
-    const col = p.x > VW/2 ? 'teal' : 'red';
-    s += svgChair(p.x, p.y, col, p.angle, p.scale, true);
-  });
-
   // ── TABLE ──
   // Base / pedestal
   s+=`<ellipse cx="${TBX}" cy="${TBY+TRY*0.78}" rx="${TRX*0.22}" ry="${TRY*0.14}" fill="#2a1004" opacity=".9"/>`;
@@ -554,12 +547,6 @@ function buildCasinoRoom(W, H) {
 
   // ── TABLE ITEMS (cards, chips, device) ──
   s += tableItems(TBX, TBY, TRX, TRY);
-
-  // ── CHAIRS FRONT (drawn after table) ──
-  chairPositions.filter(p=>p.layer==='front').forEach((p,i)=>{
-    const col = p.x > VW/2 ? 'teal' : 'red';
-    s += svgChair(p.x, p.y, col, p.angle, p.scale, false);
-  });
 
   s+=`</g>`;
   return {svgContent: s, VW, VH, TBX, TBY, TRX, TRY};
@@ -751,7 +738,7 @@ function renderRoomSceneSmall(svgEl, containerW, containerH) {
   svgEl.innerHTML=svgContent;
 }
 
-// ── Place avatar characters on their chairs ──────────────────────
+// ── Place avatars directly around the table, no chairs ───────────
 function renderScene(sceneId, players, opts={}) {
   const scene=document.getElementById(sceneId);
   if(!scene) return;
@@ -762,40 +749,48 @@ function renderScene(sceneId, players, opts={}) {
   const W = isFullscreen ? window.innerWidth  : (scene.offsetWidth  || 700);
   const H = isFullscreen ? window.innerHeight : (scene.offsetHeight || 260);
 
-  // Get the virtual coords used for the SVG
-  const VW = 800, VH = Math.round(800*(H/W));
-  // Scale factors from virtual → actual pixels
-  const scaleX = W/VW, scaleY = H/VH;
+  // Virtual coordinate space matching the SVG
+  const VW=800, VH=Math.round(800*(H/W));
+  const scaleX=W/VW, scaleY=H/VH;
 
+  // Table center & radii (must match buildCasinoRoom)
   const TBX=VW/2, TBY=VH*0.60, TRX=VW*0.35, TRY=VH*0.19;
-  const chairPos = getChairPositions(players.length, TBX, TBY, TRX, TRY);
 
-  // Avatar size: full-screen large, small scene compact
-  const avSize = isFullscreen ? 72 : 52;
-
+  const n=players.length;
   players.forEach((p, i) => {
-    const pos = chairPos[i];
-    if(!pos) return;
+    const angle=(i/n)*2*Math.PI - Math.PI/2;
 
-    // Convert virtual chair position to real pixels
-    // Seat the avatar AT the chair position — slightly above seat center
-    const realX = pos.x * scaleX;
-    const realY = (pos.y - (isFullscreen ? 30 : 20)) * scaleY;
+    // Place avatars just outside the table rim
+    const spreadX = TRX * 1.25;
+    const spreadY = TRY * 1.30;
+    const vx = TBX + spreadX * Math.cos(angle);
+    const vy = TBY + spreadY * Math.sin(angle) * 0.72;
+
+    // Perspective scale: back = smaller, front = larger
+    // sin(angle) < 0 means top half (behind table)
+    const perspScale = isFullscreen
+      ? (0.82 + 0.28 * (0.5 + 0.5 * Math.sin(angle)))   // 0.82 … 1.10
+      : (0.75 + 0.22 * (0.5 + 0.5 * Math.sin(angle)));
+
+    const baseSize = isFullscreen ? 88 : 60;
+    const avSize = Math.round(baseSize * perspScale);
+
+    const realX = vx * scaleX;
+    const realY = vy * scaleY;
 
     const av = getAv(p.avatarId||0);
-    const isPicker = p.id===opts.pickerId;
-    const isJubel  = p.id===opts.jubelId;
+    const isPicker   = p.id===opts.pickerId;
+    const isJubel    = p.id===opts.jubelId;
     const isAnswered = (opts.answeredIds||[]).includes(p.id);
 
     const seat=document.createElement('div');
     seat.className='seat'+(isPicker?' is-picker':'')+(isJubel?' jubel':'');
     seat.style.left = realX+'px';
     seat.style.top  = realY+'px';
-    // transform:translate(-50%,-100%) is in CSS — anchor bottom-center of avatar at seat
+    // CSS: transform:translate(-50%,-50%) — center of avatar on the point
+    seat.style.transform = 'translate(-50%,-50%)';
 
-    // We size the inner SVG via an attribute approach
     const avSvg = av.svg.replace('<svg ', `<svg width="${avSize}" height="${avSize}" `);
-
     seat.innerHTML=`<div class="av-wrap">${avSvg}<div class="sbadge">${isPicker?'🎯':isAnswered?'✅':''}</div></div><div class="sname">${p.name}</div>`;
     scene.appendChild(seat);
   });
