@@ -401,17 +401,19 @@ function buildCasinoRoom(W, H) {
   const C_CHAIR_T= '#20a8a0';   // teal chair (right side)
   const C_LEGS   = '#1a1a28';
 
-  // room perspective geometry
-  const vanX = VW/2, vanY = VH*0.30;  // vanishing point
-  const wallTop = VH*0.08;
-  const leftEdge = 0, rightEdge = VW;
-  const wallBottomL = VH*0.78, wallBottomR = VH*0.78;
-  const cornerL = VW*0.18, cornerR = VW*0.82;
-
   // table
   const TBX=VW/2, TBY=VH*0.60, TRX=VW*0.35, TRY=VH*0.19;
 
   let s = `<defs>
+  <linearGradient id="wallVignette" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="rgba(0,0,0,.55)"/>
+    <stop offset="60%" stop-color="rgba(0,0,0,.1)"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,.0)"/>
+  </linearGradient>
+  <radialGradient id="floorVig" cx="50%" cy="50%" r="70%">
+    <stop offset="0%" stop-color="rgba(0,0,0,0)"/>
+    <stop offset="100%" stop-color="rgba(0,0,0,.55)"/>
+  </radialGradient>
   <radialGradient id="felts" cx="40%" cy="35%" r="72%">
     <stop offset="0%" stop-color="${C_FELT_L}"/>
     <stop offset="65%" stop-color="${C_FELT}"/>
@@ -449,98 +451,61 @@ function buildCasinoRoom(W, H) {
 </defs>
 <g clip-path="url(#rc)">`;
 
-  // ── CEILING ──
-  s+=`<polygon points="${leftEdge},0 ${rightEdge},0 ${cornerR},${wallTop} ${cornerL},${wallTop}" fill="${C_CEIL}"/>`;
-  // Ceiling recessed lights
-  [[0.28,0.05],[0.5,0.04],[0.72,0.05]].forEach(([cx,cy])=>{
-    const lx=VW*cx, ly=VH*cy;
-    s+=`<ellipse cx="${lx}" cy="${ly}" rx="20" ry="8" fill="#d0c8a0" opacity=".9"/>`;
-    s+=`<ellipse cx="${lx}" cy="${ly}" rx="13" ry="5" fill="#fff8d0"/>`;
-    s+=`<ellipse cx="${lx}" cy="${ly+VH*.10}" rx="${VW*0.12}" ry="${VH*.15}" fill="rgba(255,240,160,.07)"/>`;
-  });
+  // ── SIMPLE CLEAN BACKGROUND ──
+  // Top half: dark warm wall
+  s+=`<rect width="${VW}" height="${VH*0.52}" fill="#1a1008"/>`;
+  s+=`<rect width="${VW}" height="${VH*0.52}" fill="url(#wallVignette)"/>`;
 
-  // ── LEFT WALL (teal) ──
-  s+=`<polygon points="${leftEdge},0 ${cornerL},${wallTop} ${cornerL},${wallBottomL} ${leftEdge},${VH*0.88}" fill="${C_WALL_L}"/>`;
-  // subtle light gradient
-  s+=`<polygon points="${leftEdge},0 ${cornerL},${wallTop} ${cornerL},${wallBottomL} ${leftEdge},${VH*0.88}" fill="rgba(255,255,255,.04)"/>`;
-
-  // ── BACK WALL (teal, centre) ──
-  s+=`<polygon points="${cornerL},${wallTop} ${cornerR},${wallTop} ${cornerR},${wallBottomR} ${cornerL},${wallBottomL}" fill="${C_WALL_B}"/>`;
-  // Subtle gradient on back wall
-  s+=`<polygon points="${cornerL},${wallTop} ${cornerR},${wallTop} ${cornerR},${wallBottomR} ${cornerL},${wallBottomL}" fill="url(#lampGlow)" opacity=".4"/>`;
-
-  // ── RIGHT WALL (purple/mauve) ──
-  s+=`<polygon points="${cornerR},${wallTop} ${rightEdge},0 ${rightEdge},${VH*0.88} ${cornerR},${wallBottomR}" fill="${C_WALL_R}"/>`;
-  s+=`<polygon points="${cornerR},${wallTop} ${rightEdge},0 ${rightEdge},${VH*0.88} ${cornerR},${wallBottomR}" fill="rgba(0,0,0,.12)"/>`;
-
-  // ── WOOD TRIM — corner pillars ──
-  const trimW=18;
-  // Left corner pillar
-  s+=`<polygon points="${cornerL-trimW},${wallTop} ${cornerL+trimW},${wallTop} ${cornerL+trimW},${wallBottomL} ${cornerL-trimW},${wallBottomL}" fill="${C_WOOD}"/>`;
-  s+=`<polygon points="${cornerL-trimW/2},${wallTop} ${cornerL+4},${wallTop} ${cornerL+4},${wallBottomL} ${cornerL-trimW/2},${wallBottomL}" fill="${C_WOOD_L}" opacity=".45"/>`;
-  // Right corner pillar
-  s+=`<polygon points="${cornerR-trimW},${wallTop} ${cornerR+trimW},${wallTop} ${cornerR+trimW},${wallBottomR} ${cornerR-trimW},${wallBottomR}" fill="${C_WOOD}"/>`;
-  s+=`<polygon points="${cornerR-trimW/2},${wallTop} ${cornerR+4},${wallTop} ${cornerR+4},${wallBottomR} ${cornerR-trimW/2},${wallBottomR}" fill="${C_WOOD_L}" opacity=".35"/>`;
-
-  // Ceiling / baseboard trim
-  s+=`<line x1="${cornerL}" y1="${wallTop}" x2="${cornerR}" y2="${wallTop}" stroke="${C_WOOD_L}" stroke-width="10" opacity=".9"/>`;
-  // Angled ceiling trims to corners
-  s+=`<line x1="0" y1="0" x2="${cornerL}" y2="${wallTop}" stroke="${C_WOOD}" stroke-width="8" opacity=".7"/>`;
-  s+=`<line x1="${VW}" y1="0" x2="${cornerR}" y2="${wallTop}" stroke="${C_WOOD}" stroke-width="8" opacity=".7"/>`;
-
-  // ── WOOD FLOOR ──
-  const fY=VH*0.78, fH=VH-fY;
-  const plankColors=['#7a4a18','#8b5520','#6b3e14','#9a6028','#7a4820','#885018'];
-  const plankW=52, plankH=18;
-  const plankRows=Math.ceil(fH/plankH)+2;
-  const plankCols=Math.ceil(VW/plankW)+2;
-  // clip to floor shape
-  s+=`<defs><clipPath id="floorClip"><polygon points="${leftEdge},${fY} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${fY} ${rightEdge},${VH} ${leftEdge},${VH}"/></clipPath></defs>`;
-  s+=`<g clip-path="url(#floorClip)">`;
-  // Base warm brown
-  s+=`<rect x="0" y="${fY}" width="${VW}" height="${fH}" fill="#6b3a12"/>`;
-  // Planks with perspective: each row gets slightly wider planks toward bottom
-  for(let row=0;row<plankRows;row++){
-    const ry=fY+row*plankH;
-    const perspective=1+row*(0.18/plankRows);
-    const pw=plankW*perspective;
-    const rowOffset=(row%2===0)?0:pw/2;
-    for(let col=-1;col<plankCols+1;col++){
-      const rx=col*pw+rowOffset-pw;
-      const col1=plankColors[(row*3+col)%plankColors.length];
-      const col2=plankColors[(row*2+col+3)%plankColors.length];
-      // plank body
-      s+=`<rect x="${rx}" y="${ry}" width="${pw-1.5}" height="${plankH-1}" rx="1" fill="${col1}"/>`;
-      // wood grain highlight
-      s+=`<rect x="${rx+2}" y="${ry+2}" width="${pw-8}" height="3" rx="1" fill="${col2}" opacity=".35"/>`;
-      s+=`<rect x="${rx+4}" y="${ry+8}" width="${pw-14}" height="2" rx="1" fill="${col2}" opacity=".2"/>`;
-      // plank edge shadow
-      s+=`<line x1="${rx}" y1="${ry+plankH-1}" x2="${rx+pw-1.5}" y2="${ry+plankH-1}" stroke="rgba(0,0,0,.25)" stroke-width="1.5"/>`;
-      s+=`<line x1="${rx+pw-1.5}" y1="${ry}" x2="${rx+pw-1.5}" y2="${ry+plankH}" stroke="rgba(0,0,0,.18)" stroke-width="1"/>`;
+  // ── WOOD FLOOR (bottom half, top-down planks) ──
+  const floorY = VH*0.48;
+  const plankH = 38, plankColors=['#7a4818','#8b5520','#6b3c12','#975e28','#7a4418','#844e1c'];
+  const nRows = Math.ceil((VH - floorY) / plankH) + 1;
+  const nCols = 10;
+  const plankW = VW / nCols;
+  s+=`<g>`;
+  for(let row=0; row<nRows; row++){
+    const ry = floorY + row * plankH;
+    const offset = (row%2===0) ? 0 : plankW*0.5;
+    for(let col=-1; col<nCols+1; col++){
+      const rx = col*plankW + offset - plankW;
+      const c = plankColors[(row*4+col+10)%plankColors.length];
+      const cg = plankColors[(row*3+col+7)%plankColors.length];
+      s+=`<rect x="${rx}" y="${ry}" width="${plankW-2}" height="${plankH-2}" rx="1" fill="${c}"/>`;
+      // grain lines
+      s+=`<line x1="${rx+6}" y1="${ry+6}" x2="${rx+plankW*0.7}" y2="${ry+6}" stroke="${cg}" stroke-width="1.5" opacity=".3"/>`;
+      s+=`<line x1="${rx+10}" y1="${ry+16}" x2="${rx+plankW*0.55}" y2="${ry+16}" stroke="${cg}" stroke-width="1" opacity=".2"/>`;
+      // shadow right & bottom edge
+      s+=`<line x1="${rx+plankW-2}" y1="${ry}" x2="${rx+plankW-2}" y2="${ry+plankH}" stroke="rgba(0,0,0,.3)" stroke-width="2"/>`;
+      s+=`<line x1="${rx}" y1="${ry+plankH-2}" x2="${rx+plankW}" y2="${ry+plankH-2}" stroke="rgba(0,0,0,.2)" stroke-width="1.5"/>`;
     }
   }
-  // Subtle varnish sheen overlay
-  s+=`<polygon points="${leftEdge},${fY} ${cornerL},${wallBottomL} ${cornerR},${wallBottomR} ${rightEdge},${fY} ${rightEdge},${VH} ${leftEdge},${VH}" fill="url(#lampGlow)" opacity=".18"/>`;
+  // floor vignette (darker at edges)
+  s+=`<rect x="0" y="${floorY}" width="${VW}" height="${VH-floorY}" fill="url(#floorVig)"/>`;
   s+=`</g>`;
-  // Baseboard where wall meets floor
-  s+=`<line x1="${cornerL}" y1="${wallBottomL}" x2="${cornerR}" y2="${wallBottomR}" stroke="${C_WOOD}" stroke-width="8" opacity=".9"/>`;
-  s+=`<line x1="${leftEdge}" y1="${fY}" x2="${cornerL}" y2="${wallBottomL}" stroke="${C_WOOD_L}" stroke-width="5" opacity=".5"/>`;
-  s+=`<line x1="${cornerR}" y1="${wallBottomR}" x2="${rightEdge}" y2="${fY}" stroke="${C_WOOD_L}" stroke-width="5" opacity=".5"/>`;
+
+  // ── WALL / FLOOR DIVIDER — simple skirting board ──
+  s+=`<rect x="0" y="${VH*0.48-14}" width="${VW}" height="22" rx="0" fill="#5a3010"/>`;
+  s+=`<rect x="0" y="${VH*0.48-14}" width="${VW}" height="6" fill="#a06828"/>`;
+  s+=`<rect x="0" y="${VH*0.48+6}" width="${VW}" height="2" fill="rgba(0,0,0,.35)"/>`;
+
+  // ── CEILING SPOTLIGHTS ──
+  [[0.25],[0.5],[0.75]].forEach(([cx])=>{
+    const lx=VW*cx, ly=VH*0.06;
+    s+=`<ellipse cx="${lx}" cy="${ly}" rx="18" ry="7" fill="#d8d0a0" opacity=".9"/>`;
+    s+=`<ellipse cx="${lx}" cy="${ly}" rx="11" ry="4" fill="#fff8d0"/>`;
+    s+=`<ellipse cx="${lx}" cy="${ly+VH*0.2}" rx="${VW*0.11}" ry="${VH*0.22}" fill="rgba(255,240,160,.06)"/>`;
+  });
 
   // ── WALL PICTURES ──
-  // Back wall: two flanking pictures + centre whiteboard
-  s += wallFrame(VW*0.29, VH*0.24, 110, 95, false);  // back left
-  s += wallFrame(VW*0.71, VH*0.24, 110, 95, false);  // back right
-  s += wallFrame(VW*0.50, VH*0.21, 150, 78, true);   // centre whiteboard/screen
-  // Side walls
-  s += wallFrame(VW*0.08, VH*0.30, 90, 80, false);   // left wall
-  s += wallFrame(VW*0.92, VH*0.28, 85, 78, false);   // right wall
+  s += wallFrame(VW*0.12, VH*0.28, 100, 88, false);
+  s += wallFrame(VW*0.88, VH*0.28, 100, 88, false);
+  s += wallFrame(VW*0.38, VH*0.25, 120, 80, false);
+  s += wallFrame(VW*0.62, VH*0.25, 120, 80, false);
+  s += wallFrame(VW*0.50, VH*0.22, 160, 70, true);
 
-  // ── PENDANT LAMP (central, hanging over table) ──
-  s += pendantLamp(VW/2, 0, VH*0.22, VW, VH);
-
-  // ── LAMP GLOW cone onto room ──
-  s+=`<ellipse cx="${VW/2}" cy="${VH*0.5}" rx="${VW*0.48}" ry="${VH*0.46}" fill="url(#lampGlow)" filter="url(#softglow)" opacity=".7"/>`;
+  // ── PENDANT LAMP ──
+  s += pendantLamp(VW/2, 0, VH*0.20, VW, VH);
+  s+=`<ellipse cx="${VW/2}" cy="${VH*0.45}" rx="${VW*0.5}" ry="${VH*0.42}" fill="url(#lampGlow)" filter="url(#softglow)" opacity=".65"/>`;
 
   // ── TABLE SHADOW ──
   s+=`<ellipse cx="${TBX}" cy="${TBY+TRY*0.35}" rx="${TRX*0.88}" ry="${TRY*0.4}" fill="rgba(0,0,0,.5)"/>`;
